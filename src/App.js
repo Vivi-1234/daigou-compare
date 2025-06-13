@@ -15,15 +15,15 @@ function App() {
   const [platforms, setPlatforms] = useState(() => {
     const saved = localStorage.getItem('platforms');
     return saved ? JSON.parse(saved) : [
-      { id: 1, name: 'cnfans', logo: '', url: 'https://cnfans.com' },
-      { id: 2, name: 'mulebuy', logo: '', url: 'https://mulebuy.com' },
-      { id: 3, name: 'Lovegobuy', logo: '', url: 'https://lovegobuy.com' },
-      { id: 4, name: 'Allchinabuy', logo: '', url: 'https://allchinabuy.com' },
-      { id: 5, name: 'hoobuy', logo: '', url: 'https://hoobuy.com' },
-      { id: 6, name: 'kakobuy', logo: '', url: 'https://kakobuy.com' },
-      { id: 7, name: 'oopbuy', logo: '', url: 'https://oopbuy.com' },
-      { id: 8, name: 'Acbuy', logo: '', url: 'https://acbuy.com' },
-      { id: 9, name: 'itaobuy', logo: '', url: 'https://itaobuy.com' }
+      { id: 1, name: 'cnfans', url: 'https://cnfans.com' },
+      { id: 2, name: 'mulebuy', url: 'https://mulebuy.com' },
+      { id: 3, name: 'Lovegobuy', url: 'https://lovegobuy.com' },
+      { id: 4, name: 'Allchinabuy', url: 'https://allchinabuy.com' },
+      { id: 5, name: 'hoobuy', url: 'https://hoobuy.com' },
+      { id: 6, name: 'kakobuy', url: 'https://kakobuy.com' },
+      { id: 7, name: 'oopbuy', url: 'https://oopbuy.com' },
+      { id: 8, name: 'Acbuy', url: 'https://acbuy.com' },
+      { id: 9, name: 'itaobuy', url: 'https://itaobuy.com' }
     ];
   });
 
@@ -485,6 +485,12 @@ function App() {
     );
   };
 
+  // 获取 favicon 的 URL
+  const getFaviconUrl = (url) => {
+    const domain = new URL(url).hostname;
+    return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -585,9 +591,12 @@ function App() {
                       ? 'border-blue-500 bg-blue-50 text-blue-700'
                       : 'border-gray-200 bg-white hover:border-gray-300'
                   }`}>
-                    {platform.logo && (
-                      <img src={platform.logo} alt={platform.name} className="w-6 h-6 mr-2 object-contain" />
-                    )}
+                    <img
+                      src={getFaviconUrl(platform.url)}
+                      alt={`${platform.name} favicon`}
+                      className="w-6 h-6 mr-2 object-contain"
+                      onError={(e) => { e.target.src = '/default-favicon.png'; }} // 默认占位符
+                    />
                     {selectedPlatforms.includes(platform.id) ? (
                       <a href={platform.url} target="_blank" rel="noopener noreferrer" className="font-medium hover:underline">
                         {platform.name}
@@ -684,9 +693,12 @@ function App() {
                                 <div key={platform.id} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
                                   <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-200">
                                     <div className="flex items-center">
-                                      {platform.logo && (
-                                        <img src={platform.logo} alt={platform.name} className="w-6 h-6 mr-2 object-contain" />
-                                      )}
+                                      <img
+                                        src={getFaviconUrl(platform.url)}
+                                        alt={`${platform.name} favicon`}
+                                        className="w-6 h-6 mr-2 object-contain"
+                                        onError={(e) => { e.target.src = '/default-favicon.png'; }}
+                                      />
                                       <a href={platform.url} target="_blank" rel="noopener noreferrer" className="font-bold text-gray-900 text-lg hover:underline">
                                         {platform.name}
                                       </a>
@@ -873,9 +885,12 @@ function App() {
                         .map(platform => (
                           <th key={platform.id} className="px-6 py-4 text-center font-semibold min-w-[150px]">
                             <div className="flex items-center justify-center">
-                              {platform.logo && (
-                                <img src={platform.logo} alt={platform.name} className="w-6 h-6 mr-2 object-contain" />
-                              )}
+                              <img
+                                src={getFaviconUrl(platform.url)}
+                                alt={`${platform.name} favicon`}
+                                className="w-6 h-6 mr-2 object-contain"
+                                onError={(e) => { e.target.src = '/default-favicon.png'; }}
+                              />
                               <a href={platform.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
                                 {platform.name}
                               </a>
