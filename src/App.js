@@ -10,7 +10,7 @@ function App() {
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [editMode, setEditMode] = useState(null);
   const [editPlatformId, setEditPlatformId] = useState(null);
-  const [newPlatform, setNewPlatform] = useState({ name: '', url: '', logo: '' });
+  const [newPlatform, setNewPlatform] = useState({ name: '', url: '' }); // 移除 logo 字段
 
   const [platforms, setPlatforms] = useState(() => {
     const saved = localStorage.getItem('platforms');
@@ -303,7 +303,7 @@ function App() {
       return;
     }
     const newId = Math.max(...platforms.map(p => p.id), 0) + 1;
-    const updatedPlatforms = [...platforms, { id: newId, name: newPlatform.name, url: newPlatform.url, logo: newPlatform.logo || '' }];
+    const updatedPlatforms = [...platforms, { id: newId, name: newPlatform.name, url: newPlatform.url }];
     setPlatforms(updatedPlatforms);
     setSelectedPlatforms([...selectedPlatforms, newId]);
 
@@ -316,7 +316,7 @@ function App() {
       updatedPlatformData[section].data[newId] = defaultData;
     });
     setPlatformData(updatedPlatformData);
-    setNewPlatform({ name: '', url: '', logo: '' });
+    setNewPlatform({ name: '', url: '' }); // 重置为初始状态
   };
 
   const handleDeletePlatform = (id) => {
@@ -635,12 +635,6 @@ function App() {
                   placeholder="平台URL"
                   className="p-2 border rounded-md"
                 />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={e => handleImageUpload(e, setNewPlatform, 'logo')}
-                  className="p-2"
-                />
                 <button
                   onClick={handleAddPlatform}
                   className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
@@ -648,9 +642,6 @@ function App() {
                   添加
                 </button>
               </div>
-              {newPlatform.logo && (
-                <img src={newPlatform.logo} alt="Preview" className="mt-2 h-20 w-20 object-contain" />
-              )}
             </div>
           )}
         </div>
