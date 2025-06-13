@@ -349,6 +349,10 @@ function App() {
   const handleImageUpload = (e, setState, key, sectionKey, platformId) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith('image/')) {
+      if (file.size > 5 * 1024 * 1024) { // 限制图片大小为 5MB
+        alert('图片大小不能超过 5MB！');
+        return;
+      }
       const reader = new FileReader();
       reader.onload = () => {
         if (sectionKey && platformId) {
@@ -368,6 +372,16 @@ function App() {
     }
   };
 
+  const handleDeleteImage = (sectionKey, platformId) => {
+    if (window.confirm('确认删除这张图片吗？')) {
+      setPlatformData(prev => {
+        const updated = { ...prev };
+        updated[sectionKey].data[platformId] = { ...updated[sectionKey].data[platformId], image: '' };
+        return updated;
+      });
+    }
+  };
+
   const TabButton = ({ id, label, icon: Icon }) => (
     <button
       onClick={() => setActiveTab(id)}
@@ -381,6 +395,20 @@ function App() {
       {label}
     </button>
   );
+
+  const renderSimpleData = (data, fields) => {
+    if (!data) return <span className="text-gray-400">数据缺失</span>;
+    return (
+      <div className="space-y-2 text-sm">
+        {fields.map(field => (
+          <div key={field.key}>
+            <span className="font-medium text-gray-700">{field.label}：</span>
+            <span className="text-gray-600">{data[field.key] || '数据缺失'}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   const renderPaymentMethods = (paymentData) => {
     if (!paymentData) return <span className="text-gray-400">数据缺失</span>;
@@ -414,16 +442,142 @@ function App() {
     );
   };
 
-  const renderSimpleData = (data, fields) => {
+  const renderSectionData = (key, data) => {
     if (!data) return <span className="text-gray-400">数据缺失</span>;
+
+    const fields = {
+      accountVerification: [
+        { key: 'method', label: '验证方式' },
+        { key: 'issues', label: '体验问题' },
+      ],
+      storage: [
+        { key: 'free', label: '免费保管期' },
+        { key: 'extended', label: '延长存储' },
+      ],
+      qc: [
+        { key: 'free', label: '免费QC' },
+        { key: 'extra', label: '额外QC价格' },
+        { key: 'quality', label: '照片质量' },
+      ],
+      shipping: [
+        { key: 'rehearsal', label: '预演包裹费' },
+        { key: 'seizure', label: '海关扣押险' },
+        { key: 'loss', label: '丢失/损坏险' },
+        { key: 'delay', label: '延迟险' },
+      ],
+      customerService: [
+        { key: 'hours', label: '工作时间' },
+        { key: 'days', label: '工作日' },
+        { key: 'response', label: '响应时间' },
+      ],
+      discord: [
+        { key: 'members', label: '社区人数' },
+        { key: 'activities', label: '活动频率' },
+        { key: 'rewards', label: '奖励形式' },
+        { key: 'referral', label: '拉新奖励' },
+      ],
+      timing: [
+        { key: 'accept', label: '接单时间' },
+        { key: 'purchase', label: '采购时间' },
+        { key: 'shipping', label: '卖家发货' },
+        { key: 'arrival', label: '到仓时间' },
+        { key: 'qc', label: '质检上架' },
+      ],
+      coupon: [
+        { key: 'amount', label: '优惠金额' },
+        { key: 'type', label: '券码类型' },
+        { key: 'threshold', label: '使用门槛' },
+        { key: 'maxDiscount', label: '最高折扣' },
+        { key: 'stackable', label: '叠加使用' },
+      ],
+      commission: [
+        { key: 'base', label: '基础佣金' },
+        { key: 'max', label: '最高佣金' },
+        { key: 'mechanism', label: '计算机制' },
+      ],
+      membership: [
+        { key: 'points', label: '积分获取' },
+        { key: 'usage', label: '积分使用' },
+        { key: 'special', label: '特色功能' },
+      ],
+      transshipment: [
+        { key: 'address', label: '转运地址' },
+        { key: 'requirements', label: '信息要求' },
+      ],
+      app: [
+        { key: 'systems', label: '支持系统' },
+        { key: 'size', label: '安装包大小' },
+        { key: 'languages', label: '语言货币' },
+        { key: 'features', label: '特色功能' },
+      ],
+    };
+
     return (
-      <div className="space-y-2 text-sm">
-        {fields.map(field => (
-          <div key={field.key}>
-            <span className="font-medium text-gray-700">{field.label}：</span>
-            <span className="text-gray-600">{data[field.key] || '数据缺失'}</span>
+      <div className="space-y-3 text-sm">
+        {key === 'payment' ? (
+          renderPaymentMethods(data)
+        ) : key === 'language' ? (
+          <div className="space-y-3">
+            <div>
+              <span className="font-medium text-gray-700 block mb-1">支持语言：</span>
+              <span className="text-gray-600 text-xs">{data.languages}</span>
+            </div>
+            <div>
+              <span className="font-medium text-gray-700 block mb-1">支持货币：</span>
+              <span className="text-gray-600 text-xs">{data.currencies}</span>
+            </div>
           </div>
-        ))}
+        ) : key === 'supportedPlatforms' ? (
+          <div className="text-sm">
+            <span className="font-medium text-gray-700">支持平台：</span>
+            <div className="mt-1 flex flex-wrap gap-1">
+              {data.platforms.map(p => (
+                <span key={p} className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
+                  {p}
+                </span>
+              ))}
+            </div>
+          </div>
+        ) : key === 'valueAddedService' ? (
+          <div className="space-y-3">
+            <div>
+              <span className="font-medium text-gray-700 block mb-1">免费服务：</span>
+              <span className="text-gray-600 text-xs">{data.free || '无'}</span>
+            </div>
+            <div>
+              <span className="font-medium text-gray-700 block mb-1">收费服务：</span>
+              <span className="text-gray-600 text-xs">{data.paid}</span>
+            </div>
+            {data.shipping && data.shipping !== '无' && (
+              <div>
+                <span className="font-medium text-gray-700 block mb-1">运单增值：</span>
+                <span className="text-gray-600 text-xs">{data.shipping}</span>
+              </div>
+            )}
+          </div>
+        ) : (
+          renderSimpleData(data, fields[key] || [])
+        )}
+        {data.image && (
+          <div className="mt-3 relative">
+            <img
+              src={data.image}
+              alt={`${key} Image`}
+              className="h-40 w-40 object-contain rounded-lg border border-gray-200 shadow-md hover:scale-105 transition-transform cursor-pointer"
+              loading="lazy"
+              onClick={() => window.open(data.image, '_blank')}
+            />
+            {isAdmin && (
+              <button
+                onClick={() => handleDeleteImage(key, data.platformId)}
+                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                title="删除图片"
+              >
+                <Trash className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        )}
       </div>
     );
   };
@@ -438,6 +592,10 @@ function App() {
     const handleImageChange = (e, key) => {
       const file = e.target.files[0];
       if (file && file.type.startsWith('image/')) {
+        if (file.size > 5 * 1024 * 1024) { // 限制图片大小为 5MB
+          alert('图片大小不能超过 5MB！');
+          return;
+        }
         const reader = new FileReader();
         reader.onload = () => {
           handleChange(key, reader.result);
@@ -446,6 +604,12 @@ function App() {
         reader.readAsDataURL(file);
       } else {
         alert('请上传图片文件！');
+      }
+    };
+
+    const handleDeleteImage = () => {
+      if (window.confirm('确认删除这张图片吗？')) {
+        handleChange('image', '');
       }
     };
 
@@ -462,14 +626,29 @@ function App() {
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             ) : key === 'image' ? (
-              <div>
+              <div className="space-y-2">
                 <input
                   type="file"
                   accept="image/*"
                   onChange={e => handleImageChange(e, key)}
                   className="mt-1"
                 />
-                {formData[key] && <img src={formData[key]} alt="Preview" className="mt-2 h-20 w-20 object-contain" />}
+                {formData[key] && (
+                  <div className="relative">
+                    <img
+                      src={formData[key]}
+                      alt="Preview"
+                      className="h-40 w-40 object-contain rounded-lg border border-gray-200 shadow-md"
+                    />
+                    <button
+                      onClick={handleDeleteImage}
+                      className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                      title="删除图片"
+                    >
+                      <Trash className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <input
@@ -499,7 +678,6 @@ function App() {
     );
   };
 
-  // 获取 favicon 的 URL
   const getFaviconUrl = (url) => {
     const domain = new URL(url).hostname;
     return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
@@ -595,7 +773,7 @@ function App() {
                       if (e.target.checked) {
                         setSelectedPlatforms([...selectedPlatforms, platform.id]);
                       } else {
-                        setSelectedPlatforms(selectedPlatforms.filter(id => id !== platform.id));
+                        setSelectedPlatforms(selectedPlatforms.filter(id => id !== id));
                       }
                     }}
                     className="sr-only"
@@ -690,7 +868,7 @@ function App() {
                           {platforms
                             .filter(p => selectedPlatforms.includes(p.id))
                             .map(platform => {
-                              const data = section.data[platform.id];
+                              const data = { ...section.data[platform.id], platformId: platform.id }; // 添加 platformId
 
                               return (
                                 <div key={platform.id} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
@@ -724,139 +902,7 @@ function App() {
                                       onSave={formData => handleSaveEdit(key, platform.id, formData)}
                                     />
                                   ) : (
-                                    <div className="space-y-2">
-                                      {key === 'accountVerification' && renderSimpleData(data, [
-                                        { key: 'method', label: '验证方式' },
-                                        { key: 'issues', label: '体验问题' }
-                                      ])}
-
-                                      {key === 'payment' && renderPaymentMethods(data)}
-
-                                      {key === 'storage' && renderSimpleData(data, [
-                                        { key: 'free', label: '免费保管期' },
-                                        { key: 'extended', label: '延长存储' }
-                                      ])}
-
-                                      {key === 'qc' && (
-                                        <div className="space-y-2 text-sm">
-                                          {renderSimpleData(data, [
-                                            { key: 'free', label: '免费QC' },
-                                            { key: 'extra', label: '额外QC价格' },
-                                            { key: 'quality', label: '照片质量' }
-                                          ])}
-                                          {data?.image && (
-                                            <img src={data.image} alt="QC Image" className="mt-2 h-20 w-20 object-contain" />
-                                          )}
-                                        </div>
-                                      )}
-
-                                      {key === 'shipping' && renderSimpleData(data, [
-                                        { key: 'rehearsal', label: '预演包裹费' },
-                                        { key: 'seizure', label: '海关扣押险' },
-                                        { key: 'loss', label: '丢失/损坏险' },
-                                        { key: 'delay', label: '延迟险' }
-                                      ])}
-
-                                      {key === 'customerService' && renderSimpleData(data, [
-                                        { key: 'hours', label: '工作时间' },
-                                        { key: 'days', label: '工作日' },
-                                        { key: 'response', label: '响应时间' }
-                                      ])}
-
-                                      {key === 'discord' && renderSimpleData(data, [
-                                        { key: 'members', label: '社区人数' },
-                                        { key: 'activities', label: '活动频率' },
-                                        { key: 'rewards', label: '奖励形式' },
-                                        { key: 'referral', label: '拉新奖励' }
-                                      ])}
-
-                                      {key === 'timing' && renderSimpleData(data, [
-                                        { key: 'accept', label: '接单时间' },
-                                        { key: 'purchase', label: '采购时间' },
-                                        { key: 'shipping', label: '卖家发货' },
-                                        { key: 'arrival', label: '到仓时间' },
-                                        { key: 'qc', label: '质检上架' }
-                                      ])}
-
-                                      {key === 'coupon' && renderSimpleData(data, [
-                                        { key: 'amount', label: '优惠金额' },
-                                        { key: 'type', label: '券码类型' },
-                                        { key: 'threshold', label: '使用门槛' },
-                                        { key: 'maxDiscount', label: '最高折扣' },
-                                        { key: 'stackable', label: '叠加使用' }
-                                      ])}
-
-                                      {key === 'language' && data && (
-                                        <div className="space-y-3 text-sm">
-                                          <div>
-                                            <span className="font-medium text-gray-700 block mb-1">支持语言：</span>
-                                            <span className="text-gray-600 text-xs">{data.languages}</span>
-                                          </div>
-                                          <div>
-                                            <span className="font-medium text-gray-700 block mb-1">支持货币：</span>
-                                            <span className="text-gray-600 text-xs">{data.currencies}</span>
-                                          </div>
-                                        </div>
-                                      )}
-
-                                      {key === 'commission' && renderSimpleData(data, [
-                                        { key: 'base', label: '基础佣金' },
-                                        { key: 'max', label: '最高佣金' },
-                                        { key: 'mechanism', label: '计算机制' }
-                                      ])}
-
-                                      {key === 'membership' && renderSimpleData(data, [
-                                        { key: 'points', label: '积分获取' },
-                                        { key: 'usage', label: '积分使用' },
-                                        { key: 'special', label: '特色功能' }
-                                      ])}
-
-                                      {key === 'transshipment' && renderSimpleData(data, [
-                                        { key: 'address', label: '转运地址' },
-                                        { key: 'requirements', label: '信息要求' }
-                                      ])}
-
-                                      {key === 'supportedPlatforms' && data && (
-                                        <div className="text-sm">
-                                          <span className="font-medium text-gray-700">支持平台：</span>
-                                          <div className="mt-1 flex flex-wrap gap-1">
-                                            {data.platforms.map(p => (
-                                              <span key={p} className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
-                                                {p}
-                                              </span>
-                                            ))}
-                                          </div>
-                                        </div>
-                                      )}
-
-                                      {key === 'app' && renderSimpleData(data, [
-                                        { key: 'systems', label: '支持系统' },
-                                        { key: 'size', label: '安装包大小' },
-                                        { key: 'languages', label: '语言货币' },
-                                        { key: 'features', label: '特色功能' }
-                                      ])}
-
-                                      {key === 'valueAddedService' && data && (
-                                        <div className="space-y-3 text-sm">
-                                          <div>
-                                            <span className="font-medium text-gray-700 block mb-1">免费服务：</span>
-                                            <span className="text-gray-600 text-xs">{data.free || '无'}</span>
-                                          </div>
-                                          <div>
-                                            <span className="font-medium text-gray-700 block mb-1">收费服务：</span>
-                                            <span className="text-gray-600 text-xs">{data.paid}</span>
-                                          </div>
-                                          {data.shipping && data.shipping !== '无' && (
-                                            <div>
-                                              <span className="font-medium text-gray-700 block mb-1">运单增值：</span>
-                                              <span className="text-gray-600 text-xs">{data.shipping}</span>
-                                            </div>
-                                          )}
-                                        </div>
-                                      )}
-
-                                      {!data && <span className="text-gray-400 text-sm">数据缺失</span>}
-                                    </div>
+                                    renderSectionData(key, data)
                                   )}
                                 </div>
                               );
