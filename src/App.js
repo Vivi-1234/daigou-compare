@@ -34,45 +34,45 @@ function App() {
         label: '账户验证方式',
         icon: Users,
         data: {
-          1: { method: '邮箱点击验证', issues: '有风险提示，发送到垃圾邮箱' },
-          2: { method: '邮箱点击验证', issues: '链接红色有警告意味' },
-          3: { method: '邮箱点击验证', issues: '认证按钮突出，体验较好' },
-          4: { method: '邮箱点击验证', issues: '邮件信息粗糙，链接过长' },
-          5: { method: '验证码验证', issues: '类似短信验证码' },
-          6: { method: '邮箱点击验证', issues: '用户反馈验证麻烦' },
-          7: { method: '验证码验证', issues: '发送到垃圾邮箱，内容不突出' },
-          8: { method: '邮箱点击验证', issues: '链接过长，排版混乱' },
-          9: { method: '邮箱点击验证', issues: '发送到垃圾邮箱，有风险提示' }
+          1: { method: '邮箱点击验证', issues: '有风险提示，发送到垃圾邮箱', image: '' },
+          2: { method: '邮箱点击验证', issues: '链接红色有警告意味', image: '' },
+          3: { method: '邮箱点击验证', issues: '认证按钮突出，体验较好', image: '' },
+          4: { method: '邮箱点击验证', issues: '邮件信息粗糙，链接过长', image: '' },
+          5: { method: '验证码验证', issues: '类似短信验证码', image: '' },
+          6: { method: '邮箱点击验证', issues: '用户反馈验证麻烦', image: '' },
+          7: { method: '验证码验证', issues: '发送到垃圾邮箱，内容不突出', image: '' },
+          8: { method: '邮箱点击验证', issues: '链接过长，排版混乱', image: '' },
+          9: { method: '邮箱点击验证', issues: '发送到垃圾邮箱，有风险提示', image: '' }
         }
       },
       payment: {
         label: '支付方式',
         icon: CreditCard,
         data: {
-          1: { creditCard: ['Visa', 'Amex', 'JCB', 'Mastercard'], eWallet: ['Google Pay', 'Alipay', 'Skrill'], regional: ['MyBank', 'Mbway', 'Multibanco', 'Neosurf', 'Przelewy24'], other: ['PIX', 'PayU', '余额支付'] },
-          2: { creditCard: ['Visa', 'Discover', 'Mastercard', 'Maestro', 'Diners Club'], eWallet: ['Skrill'], regional: [], other: ['余额支付'] },
-          3: { creditCard: ['Visa', 'Mastercard', 'Apple Pay', 'Google Pay', 'DC', 'AE'], eWallet: ['Alipay', 'PYUSD', 'Binance'], regional: ['巴西支付(PIX, Boleto, Ame, Picpay等)'], other: ['余额支付'] },
-          4: { creditCard: ['Visa', 'Mastercard', 'Apple Pay', 'Google Pay', 'JCB', 'Discover'], eWallet: [], regional: ['PIX', 'PayU'], other: ['余额支付'] },
-          5: { creditCard: ['Visa', 'MasterCard', 'UnionPay', 'JCB', 'Discover', 'Diners Club'], eWallet: ['Alipay'], regional: ['Sofort', 'Sepa', 'Kakao Pay', 'MyBank'], other: ['PIX', '余额支付'] },
-          6: { creditCard: ['Visa', 'Discover', 'Mastercard', 'Maestro', 'Diners Club'], eWallet: ['Google Pay', 'Alipay', 'Skrill', 'CoinPal(TRX,SOL)'], regional: ['Trustly', 'Pix', 'Payu', 'Bancontact', 'iDeal'], other: ['余额支付'] },
-          7: { creditCard: ['Apple', 'Visa', 'Master', 'Discover'], eWallet: [], regional: [], other: ['余额支付'] },
-          8: { creditCard: ['Apple', 'Visa', 'Master', 'Discover'], eWallet: ['Google Pay'], regional: ['PayU'], other: ['PIX', '余额支付'] },
-          9: { creditCard: ['Apple', 'Visa', 'Master', 'Discover'], eWallet: ['Google Pay', 'Skrill'], regional: [], other: ['余额支付'] }
+          1: { creditCard: ['Visa', 'Amex', 'JCB', 'Mastercard'], eWallet: ['Google Pay', 'Alipay', 'Skrill'], regional: ['MyBank', 'Mbway', 'Multibanco', 'Neosurf', 'Przelewy24'], other: ['PIX', 'PayU', '余额支付'], image: '' },
+          2: { creditCard: ['Visa', 'Discover', 'Mastercard', 'Maestro', 'Diners Club'], eWallet: ['Skrill'], regional: [], other: ['余额支付'], image: '' },
+          3: { creditCard: ['Visa', 'Mastercard', 'Apple Pay', 'Google Pay', 'DC', 'AE'], eWallet: ['Alipay', 'PYUSD', 'Binance'], regional: ['巴西支付(PIX, Boleto, Ame, Picpay等)'], other: ['余额支付'], image: '' },
+          4: { creditCard: ['Visa', 'Mastercard', 'Apple Pay', 'Google Pay', 'JCB', 'Discover'], eWallet: [], regional: ['PIX', 'PayU'], other: ['余额支付'], image: '' },
+          5: { creditCard: ['Visa', 'MasterCard', 'UnionPay', 'JCB', 'Discover', 'Diners Club'], eWallet: ['Alipay'], regional: ['Sofort', 'Sepa', 'Kakao Pay', 'MyBank'], other: ['PIX', '余额支付'], image: '' },
+          6: { creditCard: ['Visa', 'Discover', 'Mastercard', 'Maestro', 'Diners Club'], eWallet: ['Google Pay', 'Alipay', 'Skrill', 'CoinPal(TRX,SOL)'], regional: ['Trustly', 'Pix', 'Payu', 'Bancontact', 'iDeal'], other: ['余额支付'], image: '' },
+          7: { creditCard: ['Apple', 'Visa', 'Master', 'Discover'], eWallet: [], regional: [], other: ['余额支付'], image: '' },
+          8: { creditCard: ['Apple', 'Visa', 'Master', 'Discover'], eWallet: ['Google Pay'], regional: ['PayU'], other: ['PIX', '余额支付'], image: '' },
+          9: { creditCard: ['Apple', 'Visa', 'Master', 'Discover'], eWallet: ['Google Pay', 'Skrill'], regional: [], other: ['余额支付'], image: '' }
         }
       },
       storage: {
         label: '保管期',
         icon: Package,
         data: {
-          1: { free: '60天', extended: '最长6个月，7元/产品ID/月' },
-          2: { free: '90天', extended: '最长6个月，10元/产品ID/月' },
-          3: { free: '60天', extended: '最长6个月，10元/产品ID/月' },
-          4: { free: '90天', extended: '最长6个月，10元/月' },
-          5: { free: '90天', extended: '最长6个月，0.1元/产品ID/月' },
-          6: { free: '正常180天，异常60天', extended: '20元/订单/100天' },
-          7: { free: '正常90天，异常30天', extended: '最长6个月，10元/产品ID/月' },
-          8: { free: '90天', extended: '最长6个月，10元/产品ID/月' },
-          9: { free: '90天', extended: '10元/月' }
+          1: { free: '60天', extended: '最长6个月，7元/产品ID/月', image: '' },
+          2: { free: '90天', extended: '最长6个月，10元/产品ID/月', image: '' },
+          3: { free: '60天', extended: '最长6个月，10元/产品ID/月', image: '' },
+          4: { free: '90天', extended: '最长6个月，10元/月', image: '' },
+          5: { free: '90天', extended: '最长6个月，0.1元/产品ID/月', image: '' },
+          6: { free: '正常180天，异常60天', extended: '20元/订单/100天', image: '' },
+          7: { free: '正常90天，异常30天', extended: '最长6个月，10元/产品ID/月', image: '' },
+          8: { free: '90天', extended: '最长6个月，10元/产品ID/月', image: '' },
+          9: { free: '90天', extended: '10元/月', image: '' }
         }
       },
       qc: {
@@ -112,7 +112,7 @@ function App() {
           1: { hours: '9:30-18:00', days: '周一至周五', response: '无官方承诺', image: '' },
           2: { hours: '9:00-18:00', days: '周一至周日', response: '24小时内', image: '' },
           3: { hours: '8:30-19:00', days: '周一至周六', response: '24小时内', image: '' },
-          4: '9:00-18:00', days: '周一至周日', response: '24-48小时内', image: '' },
+          4: { hours: '9:00-18:00', days: '周一至周日', response: '24-48小时内', image: '' },
           5: { hours: '9:00-19:00', days: '周一至周日', response: '24小时内', image: '' },
           6: { hours: '8:00-17:00', days: '周一至周日', response: '无官方承诺', image: '' },
           7: { hours: '9:30-19:00', days: '无官方时间', response: '24小时内', image: '' },
@@ -566,7 +566,7 @@ function App() {
         <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-white/20 mb-6">
           <div className="flex items-center justify-between mb-4 flex-col sm:flex-row gap-4">
             <h3 className="text-lg font-bold text-gray-900 flex items-center">
-              <Filter className="w-20 h-5 mr-2 text-blue-500" />
+              <Filter className="w-5 h-5 mr-2 text-blue-500" />
               选择对比平台
             </h3>
             <div className="flex space-x-2">
