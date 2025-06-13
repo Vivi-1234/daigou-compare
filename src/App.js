@@ -10,7 +10,7 @@ function App() {
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [editMode, setEditMode] = useState(null);
   const [editPlatformId, setEditPlatformId] = useState(null);
-  const [newPlatform, setNewPlatform] = useState({ name: '', url: '', logo: '' });
+  const [newPlatform, setNewPlatform] = useState({ name: '', url: '' }); // 移除 logo 字段
 
   const [platforms, setPlatforms] = useState(() => {
     const saved = localStorage.getItem('platforms');
@@ -159,7 +159,7 @@ function App() {
           3: { amount: '$210优惠券+30%运费折扣', type: '运费折扣', threshold: '有门槛', maxDiscount: '15%', stackable: '不可叠加' },
           4: { amount: '$150优惠券', type: '运费折扣', threshold: '有门槛', maxDiscount: '12%', stackable: '不可叠加' },
           5: { amount: '$200优惠券', type: '运费折扣+商品折扣', threshold: '无门槛', maxDiscount: '10%', stackable: '不可叠加' },
-          6: { amount: '$410优惠券', type: '运费折扣券', threshold: '无门槛', maxDiscount: '12%', stackable: '不可叠加' },
+          6: { amount: '$410优惠 Convertibility to other currencies: Yes410优惠券', type: '运费折扣券', threshold: '无门槛', maxDiscount: '12%', stackable: '不可叠加' },
           7: { amount: '$210优惠券+30%运费折扣', type: '运费折扣券', threshold: '无门槛', maxDiscount: '10%', stackable: '不可叠加' },
           8: { amount: '$150优惠券', type: '运费折扣券', threshold: '无门槛', maxDiscount: '12%', stackable: '不可叠加' },
           9: { amount: '$277优惠券', type: '运费折扣', threshold: '最低门槛50CNY', maxDiscount: '40%', stackable: '不可叠加' }
@@ -220,7 +220,7 @@ function App() {
           4: { address: '广东省惠州市', requirements: '快递公司、单号、商品链接、类别、数量、单价、备注' },
           5: { address: '福建省厦门市同安区五显镇', requirements: '快递单号、包裹名字' },
           6: { address: '厦门市翔安区民安街道', requirements: '快递单号、包裹名字' },
-          7: { address: '福建省厦门市同安区埭头村', requirements: '快递单号、包裹名字' },
+          7: ' { address: '福建省厦门市同安区埭头村', requirements: '快递单号、包裹名字' },
           8: { address: '广东省惠州市', requirements: '物流公司、单号、商品名称、数量、类别、单价、备注' },
           9: { address: '广东省河源市源城区埔前镇', requirements: '快递单号、备注' }
         }
@@ -250,7 +250,7 @@ function App() {
           4: { systems: ['iOS', 'Android'], size: '数据缺失', languages: '2种语言，2种货币', features: '语言和货币种类少' },
           5: { systems: ['iOS', 'Android'], size: '108MB', languages: '8种语言，11种货币', features: '网页版没有APP二维码' },
           6: { systems: ['无APP'], size: '/', languages: '/', features: '无APP' },
-          7: { systems: ['iOS', 'Android'], size: '数据缺失', languages: '9种语言，16种货币', features: '货币种类最多，版式舒服' },
+          7: { systems: ' ['iOS', 'Android'], size: '数据缺失', languages: '9种语言，16种货币', features: '货币种类最多，版式舒服' },
           8: { systems: ['iOS', 'Android'], size: '数据缺失', languages: '仅英语', features: '语言和货币种类少' },
           9: { systems: ['iOS'], size: '82.6MB', languages: '2种语言', features: '内容简单，与电脑版相同' }
         }
@@ -303,7 +303,7 @@ function App() {
       return;
     }
     const newId = Math.max(...platforms.map(p => p.id), 0) + 1;
-    const updatedPlatforms = [...platforms, { id: newId, name: newPlatform.name, url: newPlatform.url, logo: newPlatform.logo || '' }];
+    const updatedPlatforms = [...platforms, { id: newId, name: newPlatform.name, url: newPlatform.url }];
     setPlatforms(updatedPlatforms);
     setSelectedPlatforms([...selectedPlatforms, newId]);
 
@@ -316,7 +316,7 @@ function App() {
       updatedPlatformData[section].data[newId] = defaultData;
     });
     setPlatformData(updatedPlatformData);
-    setNewPlatform({ name: '', url: '', logo: '' });
+    setNewPlatform({ name: '', url: '' }); // 移除 logo 重置
   };
 
   const handleDeletePlatform = (id) => {
@@ -406,7 +406,7 @@ function App() {
         )}
         {paymentData.other?.length > 0 && (
           <div>
-            <span className="font-medium text-gray-700">其他：</span>
+            <span className 'font-medium text-gray-700'>其他：</span>
             <span className="text-gray-600">{paymentData.other.join('、')}</span>
           </div>
         )}
@@ -635,12 +635,6 @@ function App() {
                   placeholder="平台URL"
                   className="p-2 border rounded-md"
                 />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={e => handleImageUpload(e, setNewPlatform, 'logo')}
-                  className="p-2"
-                />
                 <button
                   onClick={handleAddPlatform}
                   className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
@@ -648,9 +642,6 @@ function App() {
                   添加
                 </button>
               </div>
-              {newPlatform.logo && (
-                <img src={newPlatform.logo} alt="Preview" className="mt-2 h-20 w-20 object-contain" />
-              )}
             </div>
           )}
         </div>
