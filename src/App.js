@@ -11,7 +11,7 @@ function App() {
   const [editMode, setEditMode] = useState(null);
   const [editPlatformId, setEditPlatformId] = useState(null);
   const [newPlatform, setNewPlatform] = useState({ name: '', url: '' });
-  const [previewImage, setPreviewImage] = useState(null); // 新增状态用于图片预览
+  const [previewImage, setPreviewImage] = useState(null); // 图片预览状态
 
   const [platforms, setPlatforms] = useState(() => {
     const saved = localStorage.getItem('platforms');
@@ -566,7 +566,7 @@ function App() {
               alt={`${key} Image`}
               className="h-40 w-40 object-contain rounded-lg border border-gray-200 shadow-md hover:scale-105 transition-transform cursor-pointer"
               loading="lazy"
-              onClick={() => setPreviewImage(data.image)} // 点击触发预览
+              onClick={() => setPreviewImage(data.image)}
             />
             {isAdmin && (
               <button
@@ -585,6 +585,7 @@ function App() {
 
   const EditForm = ({ sectionKey, platformId, onClose, onSave }) => {
     const [formData, setFormData] = useState(() => ({ ...platformData[sectionKey].data[platformId] }));
+    const [customFields, setCustomFields] = useState(Object.keys(formData).map(key => ({ key, label: key.charAt(0).toUpperCase() + key.slice(1), type: key === 'image' ? 'image' : 'text' })));
 
     const handleChange = (key, value) => {
       setFormData(prev => ({ ...prev, [key]: value }));
@@ -593,7 +594,7 @@ function App() {
     const handleImageChange = (e, key) => {
       const file = e.target.files[0];
       if (file && file.type.startsWith('image/')) {
-        if (file.size > 5 * 1024 * 1024) { // 限制图片大小为 5MB
+        if (file.size > 5 * 1024 * 1024) {
           alert('图片大小不能超过 5MB！');
           return;
         }
@@ -614,30 +615,57 @@ function App() {
       }
     };
 
+    const handleAddField = () => {
+      const newFieldName = prompt('请输入新类目名称：');
+      if (newFieldName) {
+        const fieldType = prompt('请选择类目类型（text/图片）：', 'text');
+        if (fieldType === 'text' || fieldType === 'image') {
+          setCustomFields(prev => [...prev, { key: newFieldName.toLowerCase(), label: newFieldName, type: fieldType }]);
+          handleChange(newFieldName.toLowerCase(), fieldType === 'image' ? '' : '');
+        } else {
+          alert('无效类型！请选择 "text" 或 "image"。');
+        }
+      }
+    };
+
+    const handleDeleteField = (keyToDelete) => {
+      if (window.confirm(`确认删除类目 "${keyToDelete}" 吗？`)) {
+        setCustomFields(prev => prev.filter(field => field.key !== keyToDelete));
+        setFormData(prev => {
+          const newData = { ...prev };
+          delete newData[keyToDelete];
+          return newData;
+        });
+      }
+    };
+
     return (
       <div className="space-y-4">
-        {Object.keys(formData).map(key => (
-          <div key={key} className="flex flex-col">
-            <label className="block text-sm font-medium text-gray-700">{key.charAt(0).toUpperCase() + key.slice(1)}</label>
-            {Array.isArray(formData[key]) ? (
-              <input
-                type="text"
-                value={formData[key].join(',')}
-                onChange={e => handleChange(key, e.target.value.split(','))}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-            ) : key === 'image' ? (
+        {customFields.map(field => (
+          <div key={field.key} className="flex flex-col">
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-medium text-gray-700">{field.label}：</label>
+              {isAdmin && (
+                <button
+                  onClick={() => handleDeleteField(field.key)}
+                  className="p-1 text-red-500 hover:text-red-700"
+                >
+                  <Trash className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            {field.type === 'image' ? (
               <div className="space-y-2">
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={e => handleImageChange(e, key)}
+                  onChange={e => handleImageChange(e, field.key)}
                   className="mt-1"
                 />
-                {formData[key] && (
+                {formData[field.key] && (
                   <div className="relative">
                     <img
-                      src={formData[key]}
+                      src={formData[field.key]}
                       alt="Preview"
                       className="h-40 w-40 object-contain rounded-lg border border-gray-200 shadow-md"
                     />
@@ -654,13 +682,21 @@ function App() {
             ) : (
               <input
                 type="text"
-                value={formData[key]}
-                onChange={e => handleChange(key, e.target.value)}
+                value={formData[field.key] || ''}
+                onChange={e => handleChange(field.key, e.target.value)}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             )}
           </div>
         ))}
+        {isAdmin && (
+          <button
+            onClick={handleAddField}
+            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+          >
+            <Plus className="w-4 h-4 inline mr-1" /> 添加类目
+          </button>
+        )}
         <div className="flex space-x-2">
           <button
             onClick={() => onSave(formData)}
@@ -869,7 +905,7 @@ function App() {
                           {platforms
                             .filter(p => selectedPlatforms.includes(p.id))
                             .map(platform => {
-                              const data = { ...section.data[platform.id], platformId: platform.id }; // 添加 platformId
+                              const data = { ...section.data[platform.id], platformId: platform.id };
 
                               return (
                                 <div key={platform.id} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
@@ -1086,11 +1122,10 @@ function App() {
           </div>
         )}
 
-        {/* 图片预览模态框 */}
         {previewImage && (
           <div
             className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
-            onClick={() => setPreviewImage(null)} // 点击背景关闭
+            onClick={() => setPreviewImage(null)}
           >
             <div className="relative">
               <img
