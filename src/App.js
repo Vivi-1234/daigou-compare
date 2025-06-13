@@ -10,7 +10,7 @@ function App() {
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [editMode, setEditMode] = useState(null);
   const [editPlatformId, setEditPlatformId] = useState(null);
-  const [newPlatform, setNewPlatform] = useState({ name: '', url: '' }); // 移除 logo 字段
+  const [newPlatform, setNewPlatform] = useState({ name: '', url: '' });
 
   const [platforms, setPlatforms] = useState(() => {
     const saved = localStorage.getItem('platforms');
@@ -316,7 +316,7 @@ function App() {
       updatedPlatformData[section].data[newId] = defaultData;
     });
     setPlatformData(updatedPlatformData);
-    setNewPlatform({ name: '', url: '' }); // 重置为初始状态
+    setNewPlatform({ name: '', url: '' });
   };
 
   const handleDeletePlatform = (id) => {
@@ -595,12 +595,10 @@ function App() {
                       src={getFaviconUrl(platform.url)}
                       alt={`${platform.name} favicon`}
                       className="w-6 h-6 mr-2 object-contain"
-                      onError={(e) => { e.target.src = '/default-favicon.png'; }} // 默认占位符
+                      onError={(e) => { e.target.src = '/default-favicon.png'; }}
                     />
                     {selectedPlatforms.includes(platform.id) ? (
-                      <a href={platform.url} target="_blank" rel="noopener noreferrer" className="font-medium hover:underline">
-                        {platform.name}
-                      </a>
+                      <span className="font-medium">{platform.name}</span> // 移除 <a> 标签，防止跳转
                     ) : (
                       <span className="font-medium">{platform.name}</span>
                     )}
