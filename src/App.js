@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PlusCircle, Edit3, Trash2, BarChart3, TrendingUp, ShoppingCart, CreditCard, Truck, Star, Shield, Globe, MessageCircle, Users, Gift, Coins, Camera, Upload, Settings, Eye, EyeOff, Save, X } from 'lucide-react';
+import { PlusCircle, Edit3, Trash2, BarChart3, TrendingUp, ShoppingCart, CreditCard, Truck, Star, Shield, Globe, MessageCircle, Users, Gift, Coins, Camera, Upload, Settings, Eye, EyeOff, Save, X, ExternalLink } from 'lucide-react';
 
 function App() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -7,12 +7,16 @@ function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [loginPassword, setLoginPassword] = useState('');
   const [editingPlatform, setEditingPlatform] = useState(null);
+  const [editingFields, setEditingFields] = useState(false);
+  const [editingLogo, setEditingLogo] = useState(null);
   
   const [platforms, setPlatforms] = useState([
     {
       id: 1,
       name: 'cnfans',
       logo: '🇨🇳',
+      logoImage: null,
+      url: 'https://cnfans.com',
       accountMethod: '邮箱注册',
       paymentMethod: 'PayPal, 信用卡, 支付宝',
       salesTax: '免税',
@@ -31,13 +35,14 @@ function App() {
       app: 'iOS/Android',
       valueAddedService: '包装服务',
       customGoods: '支持定制商品',
-      status: 'excellent',
       images: {}
     },
     {
       id: 2,
       name: 'mulebuy',
       logo: '🐴',
+      logoImage: null,
+      url: 'https://mulebuy.com',
       accountMethod: '手机号注册',
       paymentMethod: 'PayPal, 银行卡',
       salesTax: '5%',
@@ -56,13 +61,14 @@ function App() {
       app: 'Web版',
       valueAddedService: '保险服务',
       customGoods: '不支持',
-      status: 'good',
       images: {}
     },
     {
       id: 3,
       name: 'Lovegobuy',
       logo: '❤️',
+      logoImage: null,
+      url: 'https://lovegobuy.com',
       accountMethod: '社交账号登录',
       paymentMethod: 'PayPal, Stripe',
       salesTax: '免税',
@@ -81,13 +87,14 @@ function App() {
       app: 'PWA应用',
       valueAddedService: '快递跟踪',
       customGoods: '支持定制',
-      status: 'excellent',
       images: {}
     },
     {
       id: 4,
       name: 'Allchinabuy',
       logo: '🏮',
+      logoImage: null,
+      url: 'https://allchinabuy.com',
       accountMethod: '邮箱注册',
       paymentMethod: '支付宝, 微信支付',
       salesTax: '0%',
@@ -106,13 +113,14 @@ function App() {
       app: '小程序',
       valueAddedService: '验货拍照',
       customGoods: '全面支持',
-      status: 'excellent',
       images: {}
     },
     {
       id: 5,
       name: 'hoobuy',
       logo: '🦉',
+      logoImage: null,
+      url: 'https://hoobuy.com',
       accountMethod: '快速注册',
       paymentMethod: 'PayPal, 加密货币',
       salesTax: '2%',
@@ -131,13 +139,14 @@ function App() {
       app: 'Web App',
       valueAddedService: '智能推荐',
       customGoods: '部分支持',
-      status: 'good',
       images: {}
     },
     {
       id: 6,
       name: 'kakobuy',
       logo: '🌸',
+      logoImage: null,
+      url: 'https://kakobuy.com',
       accountMethod: '邮箱/手机',
       paymentMethod: 'PayPal, 信用卡',
       salesTax: '3%',
@@ -156,13 +165,14 @@ function App() {
       app: 'App',
       valueAddedService: '代付服务',
       customGoods: '支持',
-      status: 'good',
       images: {}
     },
     {
       id: 7,
       name: 'oopbuy',
       logo: '🎯',
+      logoImage: null,
+      url: 'https://oopbuy.com',
       accountMethod: '快速注册',
       paymentMethod: 'PayPal, 支付宝',
       salesTax: '免税',
@@ -181,13 +191,14 @@ function App() {
       app: 'H5',
       valueAddedService: '质检服务',
       customGoods: '部分支持',
-      status: 'average',
       images: {}
     },
     {
       id: 8,
       name: 'Acbuy',
       logo: '⚡',
+      logoImage: null,
+      url: 'https://acbuy.com',
       accountMethod: '邮箱注册',
       paymentMethod: 'PayPal, 银行转账',
       salesTax: '4%',
@@ -206,13 +217,14 @@ function App() {
       app: 'App',
       valueAddedService: '专属客服',
       customGoods: '全面支持',
-      status: 'excellent',
       images: {}
     },
     {
       id: 9,
       name: 'itaobuy',
       logo: '🛒',
+      logoImage: null,
+      url: 'https://itaobuy.com',
       accountMethod: '手机注册',
       paymentMethod: '支付宝, 微信',
       salesTax: '1%',
@@ -231,13 +243,33 @@ function App() {
       app: '小程序+App',
       valueAddedService: '一站式服务',
       customGoods: '定制专家',
-      status: 'excellent',
       images: {}
     }
   ]);
 
   const [selectedPlatforms, setSelectedPlatforms] = useState([1, 2, 3]);
   const [editingImage, setEditingImage] = useState(null);
+
+  const [comparisonFields, setComparisonFields] = useState([
+    { key: 'accountMethod', label: '账户注册方式', icon: Users, color: 'blue' },
+    { key: 'paymentMethod', label: '支付方式', icon: CreditCard, color: 'green' },
+    { key: 'salesTax', label: '销售税', icon: Coins, color: 'yellow' },
+    { key: 'insurance', label: '保险期', icon: Shield, color: 'purple' },
+    { key: 'qc', label: 'QC质检', icon: Star, color: 'orange' },
+    { key: 'shipping', label: '物流方式', icon: Truck, color: 'indigo' },
+    { key: 'customerService', label: '客服支持', icon: MessageCircle, color: 'pink' },
+    { key: 'dc', label: '仓储中心', icon: Globe, color: 'teal' },
+    { key: 'timeLimit', label: '时效期限', icon: TrendingUp, color: 'red' },
+    { key: 'coupon', label: '优惠活动', icon: Gift, color: 'emerald' },
+    { key: 'language', label: '语言货币', icon: Globe, color: 'cyan' },
+    { key: 'unionPay', label: '银联支付', icon: CreditCard, color: 'lime' },
+    { key: 'membership', label: '会员体系', icon: Users, color: 'violet' },
+    { key: 'integration', label: '平台集成', icon: Truck, color: 'rose' },
+    { key: 'customizable', label: '定制化服务', icon: BarChart3, color: 'amber' },
+    { key: 'app', label: '移动应用', icon: ShoppingCart, color: 'sky' },
+    { key: 'valueAddedService', label: '增值服务', icon: Star, color: 'fuchsia' },
+    { key: 'customGoods', label: '定制商品', icon: Gift, color: 'slate' }
+  ]);
 
   // 管理员登录
   const handleLogin = () => {
@@ -270,6 +302,36 @@ function App() {
     setEditingPlatform(null);
   };
 
+  // 保存字段编辑
+  const saveFieldsEdit = () => {
+    setEditingFields(false);
+  };
+
+  // 添加新字段
+  const addNewField = () => {
+    const newField = {
+      key: `custom_${Date.now()}`,
+      label: '新对比项',
+      icon: Star,
+      color: 'gray'
+    };
+    setComparisonFields([...comparisonFields, newField]);
+  };
+
+  // 删除字段
+  const deleteField = (index) => {
+    const newFields = comparisonFields.filter((_, i) => i !== index);
+    setComparisonFields(newFields);
+  };
+
+  // 更新字段
+  const updateField = (index, newLabel) => {
+    const newFields = comparisonFields.map((field, i) => 
+      i === index ? { ...field, label: newLabel } : field
+    );
+    setComparisonFields(newFields);
+  };
+
   const TabButton = ({ id, label, icon: Icon }) => (
     <button
       onClick={() => setActiveTab(id)}
@@ -299,12 +361,6 @@ function App() {
   );
 
   const PlatformCard = ({ platform }) => {
-    const statusColors = {
-      excellent: 'from-green-400 to-emerald-600',
-      good: 'from-blue-400 to-blue-600',
-      average: 'from-yellow-400 to-orange-500'
-    };
-
     const isEditing = editingPlatform && editingPlatform.id === platform.id;
     const displayPlatform = isEditing ? editingPlatform : platform;
 
@@ -312,32 +368,53 @@ function App() {
       <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-100 hover:border-blue-200">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-4">
-            <div className="text-3xl bg-gray-50 rounded-xl p-3">
-              {isEditing ? (
-                <input
-                  type="text"
-                  value={displayPlatform.logo}
-                  onChange={(e) => setEditingPlatform({...editingPlatform, logo: e.target.value})}
-                  className="w-12 text-center text-2xl bg-transparent border-none outline-none"
-                />
-              ) : (
-                displayPlatform.logo
+            <div className="relative">
+              {userRole === 'admin' && (
+                <button
+                  onClick={() => setEditingLogo(platform.id)}
+                  className="absolute -top-1 -right-1 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-blue-600 shadow-lg"
+                >
+                  <Camera className="w-3 h-3" />
+                </button>
               )}
+              <div className="text-3xl bg-gray-50 rounded-xl p-3 w-16 h-16 flex items-center justify-center">
+                {displayPlatform.logoImage ? (
+                  <img src={displayPlatform.logoImage} alt={displayPlatform.name} className="w-12 h-12 object-cover rounded-lg" />
+                ) : (
+                  displayPlatform.logo
+                )}
+              </div>
             </div>
             <div>
               {isEditing ? (
-                <input
-                  type="text"
-                  value={displayPlatform.name}
-                  onChange={(e) => setEditingPlatform({...editingPlatform, name: e.target.value})}
-                  className="text-xl font-bold text-gray-900 bg-gray-50 rounded px-2 py-1 border"
-                />
+                <>
+                  <input
+                    type="text"
+                    value={displayPlatform.name}
+                    onChange={(e) => setEditingPlatform({...editingPlatform, name: e.target.value})}
+                    className="text-xl font-bold text-gray-900 bg-gray-50 rounded px-2 py-1 border mb-2"
+                  />
+                  <input
+                    type="url"
+                    value={displayPlatform.url}
+                    onChange={(e) => setEditingPlatform({...editingPlatform, url: e.target.value})}
+                    placeholder="平台网址"
+                    className="block text-sm text-blue-600 bg-gray-50 rounded px-2 py-1 border w-full"
+                  />
+                </>
               ) : (
-                <h3 className="text-xl font-bold text-gray-900">{displayPlatform.name}</h3>
+                <>
+                  <a 
+                    href={displayPlatform.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors flex items-center"
+                  >
+                    {displayPlatform.name}
+                    <ExternalLink className="w-4 h-4 ml-1 opacity-50" />
+                  </a>
+                </>
               )}
-              <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r ${statusColors[displayPlatform.status]} text-white mt-1`}>
-                {displayPlatform.status === 'excellent' ? '推荐' : displayPlatform.status === 'good' ? '良好' : '一般'}
-              </div>
             </div>
           </div>
           {userRole === 'admin' && (
@@ -395,27 +472,6 @@ function App() {
     );
   };
 
-  const comparisonFields = [
-    { key: 'accountMethod', label: '账户注册方式', icon: Users, color: 'blue' },
-    { key: 'paymentMethod', label: '支付方式', icon: CreditCard, color: 'green' },
-    { key: 'salesTax', label: '销售税', icon: Coins, color: 'yellow' },
-    { key: 'insurance', label: '保险期', icon: Shield, color: 'purple' },
-    { key: 'qc', label: 'QC质检', icon: Star, color: 'orange' },
-    { key: 'shipping', label: '物流方式', icon: Truck, color: 'indigo' },
-    { key: 'customerService', label: '客服支持', icon: MessageCircle, color: 'pink' },
-    { key: 'dc', label: '仓储中心', icon: Globe, color: 'teal' },
-    { key: 'timeLimit', label: '时效期限', icon: TrendingUp, color: 'red' },
-    { key: 'coupon', label: '优惠活动', icon: Gift, color: 'emerald' },
-    { key: 'language', label: '语言货币', icon: Globe, color: 'cyan' },
-    { key: 'unionPay', label: '银联支付', icon: CreditCard, color: 'lime' },
-    { key: 'membership', label: '会员体系', icon: Users, color: 'violet' },
-    { key: 'integration', label: '平台集成', icon: Truck, color: 'rose' },
-    { key: 'customizable', label: '定制化服务', icon: BarChart3, color: 'amber' },
-    { key: 'app', label: '移动应用', icon: ShoppingCart, color: 'sky' },
-    { key: 'valueAddedService', label: '增值服务', icon: Star, color: 'fuchsia' },
-    { key: 'customGoods', label: '定制商品', icon: Gift, color: 'slate' }
-  ];
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <div className="max-w-7xl mx-auto px-6 py-8">
@@ -450,9 +506,6 @@ function App() {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">
             代购平台对比分析
           </h1>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            智能对比主流代购平台的各项服务指标，为您的跨境购物提供最佳决策支持
-          </p>
         </div>
 
         {/* Navigation Tabs */}
@@ -486,8 +539,8 @@ function App() {
                 gradient="from-yellow-500 to-orange-600"
               />
               <MetricCard 
-                title="推荐平台" 
-                value={platforms.filter(p => p.status === 'excellent').length} 
+                title="对比维度" 
+                value={comparisonFields.length} 
                 icon={TrendingUp} 
                 gradient="from-purple-500 to-pink-600"
               />
@@ -543,7 +596,13 @@ function App() {
                         ? 'border-blue-500 bg-blue-50 text-blue-700' 
                         : 'border-gray-200 bg-white hover:border-gray-300'
                     }`}>
-                      <span className="text-lg mr-2">{platform.logo}</span>
+                      <div className="w-6 h-6 mr-2 flex items-center justify-center">
+                        {platform.logoImage ? (
+                          <img src={platform.logoImage} alt={platform.name} className="w-5 h-5 object-cover rounded" />
+                        ) : (
+                          <span className="text-sm">{platform.logo}</span>
+                        )}
+                      </div>
                       <span className="font-medium">{platform.name}</span>
                     </div>
                   </label>
@@ -553,14 +612,56 @@ function App() {
 
             {/* Comparison Table */}
             <div className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 overflow-hidden">
-              <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6">
+              <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6 flex justify-between items-center">
                 <h2 className="text-2xl font-bold text-white flex items-center">
                   <BarChart3 className="w-6 h-6 mr-2" />
                   详细对比分析
                 </h2>
+                {userRole === 'admin' && (
+                  <button
+                    onClick={() => setEditingFields(!editingFields)}
+                    className="flex items-center px-4 py-2 bg-white/20 text-white rounded-xl hover:bg-white/30 transition-colors text-sm"
+                  >
+                    <Edit3 className="w-4 h-4 mr-2" />
+                    {editingFields ? '完成编辑' : '编辑维度'}
+                  </button>
+                )}
               </div>
               
               <div className="p-6">
+                {editingFields && userRole === 'admin' && (
+                  <div className="mb-6 p-4 bg-blue-50 rounded-xl">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="font-semibold text-gray-900">编辑对比维度</h3>
+                      <button
+                        onClick={addNewField}
+                        className="flex items-center px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                      >
+                        <PlusCircle className="w-4 h-4 mr-1" />
+                        添加维度
+                      </button>
+                    </div>
+                    <div className="space-y-2">
+                      {comparisonFields.map((field, index) => (
+                        <div key={field.key} className="flex items-center space-x-2">
+                          <input
+                            type="text"
+                            value={field.label}
+                            onChange={(e) => updateField(index, e.target.value)}
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                          <button
+                            onClick={() => deleteField(index)}
+                            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
@@ -573,7 +674,13 @@ function App() {
                             index === platforms.filter(p => selectedPlatforms.includes(p.id)).length - 1 ? 'rounded-tr-xl' : ''
                           }`}>
                             <div className="flex items-center justify-center">
-                              <span className="text-2xl mr-2">{platform.logo}</span>
+                              <div className="w-6 h-6 mr-2 flex items-center justify-center">
+                                {platform.logoImage ? (
+                                  <img src={platform.logoImage} alt={platform.name} className="w-5 h-5 object-cover rounded" />
+                                ) : (
+                                  <span className="text-lg">{platform.logo}</span>
+                                )}
+                              </div>
                               <span>{platform.name}</span>
                             </div>
                           </th>
@@ -720,13 +827,27 @@ function App() {
 
             {/* Platform Summary Cards */}
             <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">平台综合评价</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">平台信息汇总</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {platforms.map((platform) => (
                   <div key={platform.id} className="bg-white/80 rounded-2xl p-6 shadow-lg border border-gray-100">
                     <div className="text-center mb-4">
-                      <div className="text-3xl mb-2">{platform.logo}</div>
-                      <h4 className="text-lg font-bold text-gray-900">{platform.name}</h4>
+                      <div className="w-12 h-12 mx-auto mb-2 flex items-center justify-center bg-gray-50 rounded-xl">
+                        {platform.logoImage ? (
+                          <img src={platform.logoImage} alt={platform.name} className="w-10 h-10 object-cover rounded-lg" />
+                        ) : (
+                          <span className="text-2xl">{platform.logo}</span>
+                        )}
+                      </div>
+                      <a 
+                        href={platform.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-lg font-bold text-gray-900 hover:text-blue-600 transition-colors flex items-center justify-center"
+                      >
+                        {platform.name}
+                        <ExternalLink className="w-4 h-4 ml-1 opacity-50" />
+                      </a>
                     </div>
                     <div className="space-y-3 text-sm">
                       <div className="flex justify-between items-center">
@@ -786,6 +907,96 @@ function App() {
                     setIsLoginModalOpen(false);
                     setLoginPassword('');
                   }}
+                  className="flex-1 bg-gray-100 text-gray-700 py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors font-semibold"
+                >
+                  取消
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Logo Upload Modal */}
+        {editingLogo && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
+              <h3 className="text-xl font-bold text-gray-900 mb-6 text-center">
+                更换 <span className="text-blue-600">{platforms.find(p => p.id === editingLogo)?.name}</span> 的Logo
+              </h3>
+              
+              <div className="space-y-6">
+                <div className="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-blue-400 transition-colors cursor-pointer"
+                     onClick={() => document.getElementById('logoInput').click()}>
+                  <div className="space-y-4">
+                    <div className="flex justify-center">
+                      <div className="p-4 bg-blue-50 rounded-full">
+                        <Upload className="w-8 h-8 text-blue-500" />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-gray-700 font-medium">点击上传Logo图片</p>
+                      <p className="text-sm text-gray-500 mt-1">或拖拽图片到此处</p>
+                    </div>
+                    <p className="text-xs text-gray-400">支持 PNG, JPG, GIF 格式</p>
+                  </div>
+                  <input
+                    id="logoInput"
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                          const newPlatforms = platforms.map(p => 
+                            p.id === editingLogo 
+                              ? {...p, logoImage: e.target.result}
+                              : p
+                          );
+                          setPlatforms(newPlatforms);
+                          setEditingLogo(null);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                </div>
+                
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-200"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-4 bg-white text-gray-500">或者</span>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">输入图片链接</label>
+                  <input
+                    type="url"
+                    placeholder="https://example.com/logo.jpg"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter' && e.target.value) {
+                        const newPlatforms = platforms.map(p => 
+                          p.id === editingLogo 
+                            ? {...p, logoImage: e.target.value}
+                            : p
+                        );
+                        setPlatforms(newPlatforms);
+                        setEditingLogo(null);
+                      }
+                    }}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">按回车键确认添加</p>
+                </div>
+              </div>
+              
+              <div className="flex space-x-3 mt-8">
+                <button
+                  onClick={() => setEditingLogo(null)}
                   className="flex-1 bg-gray-100 text-gray-700 py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors font-semibold"
                 >
                   取消
