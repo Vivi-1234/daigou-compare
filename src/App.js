@@ -201,7 +201,7 @@ function App() {
         data: {
           1: { points: '1CNY运费=1积分，100积分=1元', usage: '可兑换商品、增值服务、运费折扣等', special: '可通过余额购买积分', image: '' },
           2: { points: '无会员体系', usage: '/', special: '/', image: '' },
-          3: { points: '无会员体系', usage: '/', special: '/', image: '' },
+          3: '无会员体系', usage: '/', special: '/', image: '' },
           4: { points: '运费每消费1元积1分', usage: '100积分=1元，可抵扣运费', special: '积分可叠加使用，有效期1年', image: '' },
           5: { points: '无会员体系', usage: '/', special: '/', image: '' },
           6: { points: '无会员体系', usage: '/', special: '/', image: '' },
@@ -394,7 +394,7 @@ function App() {
         )}
         {paymentData.eWallet?.length > 0 && (
           <div>
-            <span className="font-medium text-gray-700">电子钱包：</span>
+            <span classWName="font-medium text-gray-700">电子钱包：</span>
             <span className="text-gray-600">{paymentData.eWallet.join('、')}</span>
           </div>
         )}
@@ -410,6 +410,7 @@ function App() {
             <span className="text-gray-600">{paymentData.other.join('、')}</span>
           </div>
         )}
+        {paymentData.image && <img src={paymentData.image} alt="Payment Image" className="mt-2 h-20 w-20 object-contain" />}
       </div>
     );
   };
@@ -424,6 +425,7 @@ function App() {
             <span className="text-gray-600">{data[field.key] || '数据缺失'}</span>
           </div>
         ))}
+        {data.image && <img src={data.image} alt="Section Image" className="mt-2 h-20 w-20 object-contain" />}
       </div>
     );
   };
