@@ -663,49 +663,91 @@ function App() {
                 )}
                 
                 <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b-2 border-gray-200">
-                        <th className="text-left py-4 px-6 font-bold text-gray-900 w-48 bg-gray-50 rounded-tl-xl">
-                          对比维度
-                        </th>
-                        {platforms.filter(p => selectedPlatforms.includes(p.id)).map((platform, index) => (
-                          <th key={platform.id} className={`text-center py-4 px-6 font-bold text-gray-900 min-w-48 bg-gray-50 ${
-                            index === platforms.filter(p => selectedPlatforms.includes(p.id)).length - 1 ? 'rounded-tr-xl' : ''
-                          }`}>
-                            <div className="flex items-center justify-center">
-                              <div className="w-6 h-6 mr-2 flex items-center justify-center">
-                                {platform.logoImage ? (
-                                  <img src={platform.logoImage} alt={platform.name} className="w-5 h-5 object-cover rounded" />
-                                ) : (
-                                  <span className="text-lg">{platform.logo}</span>
-                                )}
-                              </div>
-                              <span>{platform.name}</span>
-                            </div>
+                    <table className="w-full border-separate border-spacing-0">
+                      <thead>
+                        <tr className="border-b-2 border-gray-200">
+                          <th className="text-left py-4 px-6 font-bold text-gray-900 w-48 bg-gray-50 rounded-tl-xl sticky left-0 z-20">
+                            对比维度
                           </th>
-                        ))}
-                      </tr>
-                    </thead>
+                          {platforms.filter(p => selectedPlatforms.includes(p.id)).map((platform, index) => (
+                            <th 
+                              key={platform.id} 
+                              id={`platform-col-${platform.id}`}
+                              className={`text-center py-4 px-6 font-bold text-gray-900 min-w-48 bg-gray-50 ${
+                                index === platforms.filter(p => selectedPlatforms.includes(p.id)).length - 1 ? 'rounded-tr-xl' : ''
+                              }`}
+                            >
+                              <div className="flex items-center justify-center">
+                                <div className="w-6 h-6 mr-2 flex items-center justify-center">
+                                  {platform.logoImage ? (
+                                    <img src={platform.logoImage} alt={platform.name} className="w-5 h-5 object-cover rounded" />
+                                  ) : (
+                                    <span className="text-lg">{platform.logo}</span>
+                                  )}
+                                </div>
+                                <div className="flex flex-col">
+                                  <span>{platform.name}</span>
+                                  {userRole === 'admin' && (
+                                    <a 
+                                      href={platform.url} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-xs text-blue-500 hover:text-blue-700 flex items-center justify-center mt-1"
+                                    >
+                                      <ExternalLink className="w-3 h-3 mr-1" />
+                                      访问官网
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
                     <tbody>
                       {comparisonFields.map((field, index) => (
                         <tr key={field.key} className={`border-b border-gray-100 hover:bg-gray-50/50 transition-colors ${
                           index % 2 === 0 ? 'bg-white/50' : 'bg-gray-50/30'
                         }`}>
-                          <td className="py-4 px-6 font-semibold text-gray-800">
+                          <td className="py-4 px-6 font-semibold text-gray-800 sticky left-0 z-10 bg-white">
                             <div className="flex items-center">
                               <div className={`p-2 rounded-lg bg-${field.color}-100 mr-3`}>
                                 <field.icon className={`w-4 h-4 text-${field.color}-600`} />
                               </div>
-                              {field.label}
+                              {editingFields && userRole === 'admin' ? (
+                                <input
+                                  type="text"
+                                  value={field.label}
+                                  onChange={(e) => updateField(index, e.target.value)}
+                                  className="font-semibold text-gray-800 bg-gray-50 rounded px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                              ) : (
+                                field.label
+                              )}
                             </div>
                           </td>
                           {platforms.filter(p => selectedPlatforms.includes(p.id)).map((platform) => (
                             <td key={platform.id} className="py-4 px-6">
                               <div className="text-center space-y-3">
-                                <div className="font-medium text-gray-700 bg-white/80 rounded-lg p-2 shadow-sm">
-                                  {platform[field.key]}
-                                </div>
+                                {userRole === 'admin' ? (
+                                  <textarea
+                                    value={platform[field.key]}
+                                    onChange={(e) => {
+                                      const newPlatforms = platforms.map(p => 
+                                        p.id === platform.id 
+                                          ? {...p, [field.key]: e.target.value}
+                                          : p
+                                      );
+                                      setPlatforms(newPlatforms);
+                                    }}
+                                    className="w-full font-medium text-gray-700 bg-white/80 rounded-lg p-2 shadow-sm border border-gray-200 focus:border-blue-500 focus:outline-none resize-none"
+                                    rows="2"
+                                  />
+                                ) : (
+                                  <div className="font-medium text-gray-700 bg-white/80 rounded-lg p-2 shadow-sm">
+                                    {platform[field.key]}
+                                  </div>
+                                )}
                                 {userRole === 'admin' && (
                                   <>
                                     {platform.images[field.key] ? (
