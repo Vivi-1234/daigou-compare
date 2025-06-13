@@ -291,6 +291,12 @@ function App() {
     }
   };
 
+  const handleAdminLogout = () => {
+    setIsAdmin(false);
+    setEditMode(null);
+    setEditPlatformId(null);
+  };
+
   const handleAddPlatform = () => {
     if (!newPlatform.name || !newPlatform.url) {
       alert('请输入平台名称和URL');
@@ -422,7 +428,6 @@ function App() {
     );
   };
 
-  // 转换为 React 组件
   const EditForm = ({ sectionKey, platformId, onClose, onSave }) => {
     const [formData, setFormData] = useState(() => ({ ...platformData[sectionKey].data[platformId] }));
 
@@ -497,7 +502,7 @@ function App() {
 
         <div className="flex justify-end mb-4">
           <button
-            onClick={() => setShowAdminModal(true)}
+            onClick={() => (isAdmin ? handleAdminLogout() : setShowAdminModal(true))}
             className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 flex items-center"
           >
             <Edit className="w-4 h-4 mr-2" /> {isAdmin ? '退出管理员模式' : '进入管理员模式'}
