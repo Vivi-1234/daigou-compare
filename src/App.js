@@ -94,180 +94,180 @@ function App() {
         label: '运费与保险',
         icon: Truck,
         data: {
-          1: { rehearsal: '20元', seizure: '保险费免费', loss: '丢失/损坏可在发货后60天内申请', delay: '无' },
-          2: { rehearsal: '20元', seizure: '商品价值的3%（最低25元）', loss: '无', delay: '无' },
-          3: { rehearsal: '15元', seizure: '无', loss: '无', delay: '无' },
-          4: { rehearsal: '20元', seizure: '最高赔付商品7000元+运费3000元', loss: '最高赔付商品7000元+运费3000元', delay: '未在标准时间内交付，退还20%运费' },
-          5: { rehearsal: '20元', seizure: '保险费=(物品价值+运费)*3%', loss: '丢失/破损赔付需寄送后30天申请', delay: '45天未送达，赔付实际运费20%' },
-          6: { rehearsal: '20元', seizure: '保险费率3%', loss: '丢件/破损需寄送后45天申请', delay: '30天未送达，赔付实际运费20%' },
-          7: { rehearsal: '20元', seizure: '按实付运费15%赔付，最高5000元', loss: '丢失全额退还，轻度损坏送6$优惠券', delay: '分级赔付：1.5倍时效15%，2倍50%，3倍100%' },
-          8: { rehearsal: '20元', seizure: '最高赔付产品7000元+运费3000元', loss: '最高赔付产品7000元+运费3000元', delay: '无' },
-          9: { rehearsal: '无', seizure: '无', loss: '无', delay: '无' }
+          1: { rehearsal: '20元', seizure: '保险费免费', loss: '丢失/损坏可在发货后60天内申请', delay: '无', image: '' },
+          2: { rehearsal: '20元', seizure: '商品价值的3%（最低25元）', loss: '无', delay: '无', image: '' },
+          3: { rehearsal: '15元', seizure: '无', loss: '无', delay: '无', image: '' },
+          4: { rehearsal: '20元', seizure: '最高赔付商品7000元+运费3000元', loss: '最高赔付商品7000元+运费3000元', delay: '未在标准时间内交付，退还20%运费', image: '' },
+          5: { rehearsal: '20元', seizure: '保险费=(物品价值+运费)*3%', loss: '丢失/破损赔付需寄送后30天申请', delay: '45天未送达，赔付实际运费20%', image: '' },
+          6: { rehearsal: '20元', seizure: '保险费率3%', loss: '丢件/破损需寄送后45天申请', delay: '30天未送达，赔付实际运费20%', image: '' },
+          7: { rehearsal: '20元', seizure: '按实付运费15%赔付，最高5000元', loss: '丢失全额退还，轻度损坏送6$优惠券', delay: '分级赔付：1.5倍时效15%，2倍50%，3倍100%', image: '' },
+          8: { rehearsal: '20元', seizure: '最高赔付产品7000元+运费3000元', loss: '最高赔付产品7000元+运费3000元', delay: '无', image: '' },
+          9: { rehearsal: '无', seizure: '无', loss: '无', delay: '无', image: '' }
         }
       },
       customerService: {
         label: '客服支持',
         icon: MessageCircle,
         data: {
-          1: { hours: '9:30-18:00', days: '周一至周五', response: '无官方承诺' },
-          2: { hours: '9:00-18:00', days: '周一至周日', response: '24小时内' },
-          3: { hours: '8:30-19:00', days: '周一至周六', response: '24小时内' },
-          4: { hours: '9:00-18:00', days: '周一至周日', response: '24-48小时内' },
-          5: { hours: '9:00-19:00', days: '周一至周日', response: '24小时内' },
-          6: { hours: '8:00-17:00', days: '周一至周日', response: '无官方承诺' },
-          7: { hours: '9:30-19:00', days: '无官方时间', response: '24小时内' },
-          8: { hours: '9:00-18:00', days: '无官方时间', response: '24-48小时内' },
-          9: { hours: '9:00-18:00', days: '无官方时间', response: '12小时内' }
+          1: { hours: '9:30-18:00', days: '周一至周五', response: '无官方承诺', image: '' },
+          2: { hours: '9:00-18:00', days: '周一至周日', response: '24小时内', image: '' },
+          3: { hours: '8:30-19:00', days: '周一至周六', response: '24小时内', image: '' },
+          4: '9:00-18:00', days: '周一至周日', response: '24-48小时内', image: '' },
+          5: { hours: '9:00-19:00', days: '周一至周日', response: '24小时内', image: '' },
+          6: { hours: '8:00-17:00', days: '周一至周日', response: '无官方承诺', image: '' },
+          7: { hours: '9:30-19:00', days: '无官方时间', response: '24小时内', image: '' },
+          8: { hours: '9:00-18:00', days: '无官方时间', response: '24-48小时内', image: '' },
+          9: { hours: '9:00-18:00', days: '无官方时间', response: '12小时内', image: '' }
         }
       },
       discord: {
         label: 'Discord社区',
         icon: Users,
         data: {
-          1: { members: '337,269', activities: '每月1-2个活动，参与人数约3000人', rewards: '赠予积分+运费折扣', referral: '前几百名邀请可获1000CNY大礼包' },
-          2: { members: '75,449', activities: '每月1-3个活动，参与人数约1000人', rewards: '优惠券充值+送商品', referral: '邀请5个朋友获100运费优惠' },
-          3: { members: '7,585', activities: '每月1个活动，参与人数约200人', rewards: '优惠券+balance', referral: '邀请3个用户获20%运费折扣' },
-          4: { members: '103,085', activities: '每月1个活动，参与人数约2000人', rewards: '等级抽奖，免运费+免费商品', referral: '前5名获不同价值现金或代金券' },
-          5: { members: '52,014', activities: '被Discord封禁', rewards: '被Discord封禁', referral: '被Discord封禁' },
-          6: { members: '43,550', activities: '每月1个活动，参与人数约1500人', rewards: '免运费+商品充值', referral: '前30名获免运费和3元/邀请' },
-          7: { members: '54,249', activities: '每月1-2个活动，参与人数约600-700人', rewards: '优惠券+oopbuy硬币', referral: '邀请好友注册获30%运费折扣' },
-          8: { members: '47,743', activities: '每月1-2个活动，参与人数约200人', rewards: '运费优惠券，商家礼赠', referral: '前5名获不同价值现金或代金券' },
-          9: { members: '396', activities: '目前只举行了一次', rewards: '运费优惠券', referral: '无' }
+          1: { members: '337,269', activities: '每月1-2个活动，参与人数约3000人', rewards: '赠予积分+运费折扣', referral: '前几百名邀请可获1000CNY大礼包', image: '' },
+          2: { members: '75,449', activities: '每月1-3个活动，参与人数约1000人', rewards: '优惠券充值+送商品', referral: '邀请5个朋友获100运费优惠', image: '' },
+          3: { members: '7,585', activities: '每月1个活动，参与人数约200人', rewards: '优惠券+balance', referral: '邀请3个用户获20%运费折扣', image: '' },
+          4: { members: '103,085', activities: '每月1个活动，参与人数约2000人', rewards: '等级抽奖，免运费+免费商品', referral: '前5名获不同价值现金或代金券', image: '' },
+          5: { members: '52,014', activities: '被Discord封禁', rewards: '被Discord封禁', referral: '被Discord封禁', image: '' },
+          6: { members: '43,550', activities: '每月1个活动，参与人数约1500人', rewards: '免运费+商品充值', referral: '前30名获免运费和3元/邀请', image: '' },
+          7: { members: '54,249', activities: '每月1-2个活动，参与人数约600-700人', rewards: '优惠券+oopbuy硬币', referral: '邀请好友注册获30%运费折扣', image: '' },
+          8: { members: '47,743', activities: '每月1-2个活动，参与人数约200人', rewards: '运费优惠券，商家礼赠', referral: '前5名获不同价值现金或代金券', image: '' },
+          9: { members: '396', activities: '目前只举行了一次', rewards: '运费优惠券', referral: '无', image: '' }
         }
       },
       timing: {
         label: '时效',
         icon: Clock,
         data: {
-          1: { accept: '2小时', purchase: '6小时', shipping: '27小时', arrival: '3-4天', qc: '24小时' },
-          2: { accept: '数据缺失', purchase: '数据缺失', shipping: '数据缺失', arrival: '数据缺失', qc: '数据缺失' },
-          3: { accept: '0.5小时', purchase: '6小时', shipping: '24小时', arrival: '1-3天', qc: '24小时' },
-          4: { accept: '0.5小时', purchase: '不愿透露', shipping: '48小时', arrival: '2天', qc: '48小时' },
-          5: { accept: '0.5小时', purchase: '北京时间8-18点6小时内，18-8点次日14点前', shipping: '淘宝/1688卖家3-7天', arrival: '珠三角1-2天，长三角3-5天，偏远7天', qc: '24小时(工作日)' },
-          6: { accept: '12小时', purchase: '6小时', shipping: '淘宝和1688通常2-7天', arrival: '2天', qc: '24小时' },
-          7: { accept: '6小时', purchase: '6小时', shipping: '淘宝3-7天，京东自营当天', arrival: '珠三角1-2天，长三角3-5天，偏远7天', qc: '24小时' },
-          8: { accept: '0.5小时', purchase: '不愿透露', shipping: '24小时', arrival: '1-3天', qc: '24小时' },
-          9: { accept: '4.5小时', purchase: '6小时', shipping: '24小时', arrival: '3-5天', qc: '48小时' }
+          1: { accept: '2小时', purchase: '6小时', shipping: '27小时', arrival: '3-4天', qc: '24小时', image: '' },
+          2: { accept: '数据缺失', purchase: '数据缺失', shipping: '数据缺失', arrival: '数据缺失', qc: '数据缺失', image: '' },
+          3: { accept: '0.5小时', purchase: '6小时', shipping: '24小时', arrival: '1-3天', qc: '24小时', image: '' },
+          4: { accept: '0.5小时', purchase: '不愿透露', shipping: '48小时', arrival: '2天', qc: '48小时', image: '' },
+          5: { accept: '0.5小时', purchase: '北京时间8-18点6小时内，18-8点次日14点前', shipping: '淘宝/1688卖家3-7天', arrival: '珠三角1-2天，长三角3-5天，偏远7天', qc: '24小时(工作日)', image: '' },
+          6: { accept: '12小时', purchase: '6小时', shipping: '淘宝和1688通常2-7天', arrival: '2天', qc: '24小时', image: '' },
+          7: { accept: '6小时', purchase: '6小时', shipping: '淘宝3-7天，京东自营当天', arrival: '珠三角1-2天，长三角3-5天，偏远7天', qc: '24小时', image: '' },
+          8: { accept: '0.5小时', purchase: '不愿透露', shipping: '24小时', arrival: '1-3天', qc: '24小时', image: '' },
+          9: { accept: '4.5小时', purchase: '6小时', shipping: '24小时', arrival: '3-5天', qc: '48小时', image: '' }
         }
       },
       coupon: {
         label: '优惠券',
         icon: Gift,
         data: {
-          1: { amount: '$150优惠券', type: '运费折扣', threshold: '无门槛', maxDiscount: '10.74%', stackable: '不可叠加' },
-          2: { amount: '$210优惠券', type: '数据缺失', threshold: '数据缺失', maxDiscount: '数据缺失', stackable: '数据缺失' },
-          3: { amount: '$210优惠券+30%运费折扣', type: '运费折扣', threshold: '有门槛', maxDiscount: '15%', stackable: '不可叠加' },
-          4: { amount: '$150优惠券', type: '运费折扣', threshold: '有门槛', maxDiscount: '12%', stackable: '不可叠加' },
-          5: { amount: '$200优惠券', type: '运费折扣+商品折扣', threshold: '无门槛', maxDiscount: '10%', stackable: '不可叠加' },
-          6: { amount: '$410优惠券', type: '运费折扣券', threshold: '无门槛', maxDiscount: '12%', stackable: '不可叠加' },
-          7: { amount: '$210优惠券+30%运费折扣', type: '运费折扣券', threshold: '无门槛', maxDiscount: '10%', stackable: '不可叠加' },
-          8: { amount: '$150优惠券', type: '运费折扣券', threshold: '无门槛', maxDiscount: '12%', stackable: '不可叠加' },
-          9: { amount: '$277优惠券', type: '运费折扣', threshold: '最低门槛50CNY', maxDiscount: '40%', stackable: '不可叠加' }
+          1: { amount: '$150优惠券', type: '运费折扣', threshold: '无门槛', maxDiscount: '10.74%', stackable: '不可叠加', image: '' },
+          2: { amount: '$210优惠券', type: '数据缺失', threshold: '数据缺失', maxDiscount: '数据缺失', stackable: '数据缺失', image: '' },
+          3: { amount: '$210优惠券+30%运费折扣', type: '运费折扣', threshold: '有门槛', maxDiscount: '15%', stackable: '不可叠加', image: '' },
+          4: { amount: '$150优惠券', type: '运费折扣', threshold: '有门槛', maxDiscount: '12%', stackable: '不可叠加', image: '' },
+          5: { amount: '$200优惠券', type: '运费折扣+商品折扣', threshold: '无门槛', maxDiscount: '10%', stackable: '不可叠加', image: '' },
+          6: { amount: '$410优惠券', type: '运费折扣券', threshold: '无门槛', maxDiscount: '12%', stackable: '不可叠加', image: '' },
+          7: { amount: '$210优惠券+30%运费折扣', type: '运费折扣券', threshold: '无门槛', maxDiscount: '10%', stackable: '不可叠加', image: '' },
+          8: { amount: '$150优惠券', type: '运费折扣券', threshold: '无门槛', maxDiscount: '12%', stackable: '不可叠加', image: '' },
+          9: { amount: '$277优惠券', type: '运费折扣', threshold: '最低门槛50CNY', maxDiscount: '40%', stackable: '不可叠加', image: '' }
         }
       },
       language: {
         label: '语言与货币',
         icon: Globe,
         data: {
-          1: { languages: '10种：英语、法语、中文、西班牙语、意大利语、德语、葡萄牙语、瑞典语、波兰语、罗马尼亚语', currencies: '9种：人民币、英镑、美元、澳元、新西兰元、欧元、加元、瑞士法郎、波兰兹罗提' },
-          2: { languages: '10种：英语、西班牙语、波兰语、瑞典语、中文、法语、葡萄牙语、德语、意大利语、捷克语', currencies: '9种：人民币、加元、英镑、美元、澳元、新西兰元、欧元、波兰兹罗提、瑞士法郎' },
-          3: { languages: '8种：英语、西班牙语、德语、波兰语、葡萄牙语、意大利语、法语、阿拉伯语', currencies: '5种：美元、英镑、欧元、巴西雷亚尔、波兰兹罗提' },
-          4: { languages: '2种：中文、英文', currencies: '2种：人民币、美元' },
-          5: { languages: '7种：意大利语、德语、法语、西班牙语、英语、波兰语、中文(简体)', currencies: '11种：美元、欧元、澳元、墨西哥比索、韩元、英镑、新西兰元、加元、巴西雷亚尔、人民币、波兰兹罗提' },
-          6: { languages: '16种：简体中文、波兰语、西班牙语、阿拉伯语、中文、俄语、法语、瑞典语、英语、德语、韩语、葡萄牙语、荷兰语、意大利语、日语、罗马尼亚语', currencies: '11种：人民币、英镑、波兰兹罗提、澳元、新西兰元、美元、加元、欧元、新加坡元、瑞士法郎、捷克克朗' },
-          7: { languages: '9种：英语、捷克语、德语、日语、葡萄牙语、简体中文、法语、意大利语、波兰语、西班牙语', currencies: '16种：美元、加元、欧元、墨西哥比索、丹麦克朗、瑞典克朗、韩元、澳元、人民币、日元、新西兰元、波兰兹罗提、瑞士法郎、英镑、挪威克朗' },
-          8: { languages: '4种：英语、波兰语、西班牙文、中文(简体)', currencies: '4种：美元、波兰兹罗提、欧元、人民币' },
-          9: { languages: '2种：中文、英语', currencies: '15种：美元、英镑、欧元、新西兰元、澳元、加元、人民币、墨西哥比索、巴西雷亚尔、韩元、波兰兹罗提、捷克克朗、丹麦克朗、挪威克朗、瑞典克朗' }
+          1: { languages: '10种：英语、法语、中文、西班牙语、意大利语、德语、葡萄牙语、瑞典语、波兰语、罗马尼亚语', currencies: '9种：人民币、英镑、美元、澳元、新西兰元、欧元、加元、瑞士法郎、波兰兹罗提', image: '' },
+          2: { languages: '10种：英语、西班牙语、波兰语、瑞典语、中文、法语、葡萄牙语、德语、意大利语、捷克语', currencies: '9种：人民币、加元、英镑、美元、澳元、新西兰元、欧元、波兰兹罗提、瑞士法郎', image: '' },
+          3: { languages: '8种：英语、西班牙语、德语、波兰语、葡萄牙语、意大利语、法语、阿拉伯语', currencies: '5种：美元、英镑、欧元、巴西雷亚尔、波兰兹罗提', image: '' },
+          4: { languages: '2种：中文、英文', currencies: '2种：人民币、美元', image: '' },
+          5: { languages: '7种：意大利语、德语、法语、西班牙语、英语、波兰语、中文(简体)', currencies: '11种：美元、欧元、澳元、墨西哥比索、韩元、英镑、新西兰元、加元、巴西雷亚尔、人民币、波兰兹罗提', image: '' },
+          6: { languages: '16种：简体中文、波兰语、西班牙语、阿拉伯语、中文、俄语、法语、瑞典语、英语、德语、韩语、葡萄牙语、荷兰语、意大利语、日语、罗马尼亚语', currencies: '11种：人民币、英镑、波兰兹罗提、澳元、新西兰元、美元、加元、欧元、新加坡元、瑞士法郎、捷克克朗', image: '' },
+          7: { languages: '9种：英语、捷克语、德语、日语、葡萄牙语、简体中文、法语、意大利语、波兰语、西班牙语', currencies: '16种：美元、加元、欧元、墨西哥比索、丹麦克朗、瑞典克朗、韩元、澳元、人民币、日元、新西兰元、波兰兹罗提、瑞士法郎、英镑、挪威克朗', image: '' },
+          8: { languages: '4种：英语、波兰语、西班牙文、中文(简体)', currencies: '4种：美元、波兰兹罗提、欧元、人民币', image: '' },
+          9: { languages: '2种：中文、英语', currencies: '15种：美元、英镑、欧元、新西兰元、澳元、加元、人民币、墨西哥比索、巴西雷亚尔、韩元、波兰兹罗提、捷克克朗、丹麦克朗、挪威克朗、瑞典克朗', image: '' }
         }
       },
       commission: {
         label: '联盟佣金',
         icon: Percent,
         data: {
-          1: { base: '3%', max: '7%', mechanism: '邀请用户国际物流货运越多，奖励越多' },
-          2: { base: '数据缺失', max: '数据缺失', mechanism: '数据缺失' },
-          3: { base: '容易获取较高比例', max: '根据邀请用户数量', mechanism: '邀请用户总运费消费×对应百分比' },
-          4: { base: '3.5%', max: '7.5%', mechanism: '关联用户完成包裹消费时获得奖金' },
-          5: { base: '商品+运费', max: '商品折扣', mechanism: '商品消费及运费消费都计入佣金体系' },
-          6: { base: '3.5%', max: '7.5%', mechanism: '邀请用户支付国际运费×对应佣金比例' },
-          7: { base: '2%', max: '6%', mechanism: '首单5$+订单1%+运费2-6%' },
-          8: { base: '3.5%', max: '7.5%', mechanism: '同Allchinabuy' },
-          9: { base: '4%', max: '9%', mechanism: '累计用户支付运费金额×对应比例' }
+          1: { base: '3%', max: '7%', mechanism: '邀请用户国际物流货运越多，奖励越多', image: '' },
+          2: { base: '数据缺失', max: '数据缺失', mechanism: '数据缺失', image: '' },
+          3: { base: '容易获取较高比例', max: '根据邀请用户数量', mechanism: '邀请用户总运费消费×对应百分比', image: '' },
+          4: { base: '3.5%', max: '7.5%', mechanism: '关联用户完成包裹消费时获得奖金', image: '' },
+          5: { base: '商品+运费', max: '商品折扣', mechanism: '商品消费及运费消费都计入佣金体系', image: '' },
+          6: { base: '3.5%', max: '7.5%', mechanism: '邀请用户支付国际运费×对应佣金比例', image: '' },
+          7: { base: '2%', max: '6%', mechanism: '首单5$+订单1%+运费2-6%', image: '' },
+          8: { base: '3.5%', max: '7.5%', mechanism: '同Allchinabuy', image: '' },
+          9: { base: '4%', max: '9%', mechanism: '累计用户支付运费金额×对应比例', image: '' }
         }
       },
       membership: {
         label: '会员体系',
         icon: Award,
         data: {
-          1: { points: '1CNY运费=1积分，100积分=1元', usage: '可兑换商品、增值服务、运费折扣等', special: '可通过余额购买积分' },
-          2: { points: '无会员体系', usage: '/', special: '/' },
-          3: { points: '无会员体系', usage: '/', special: '/' },
-          4: { points: '运费每消费1元积1分', usage: '100积分=1元，可抵扣运费', special: '积分可叠加使用，有效期1年' },
-          5: { points: '无会员体系', usage: '/', special: '/' },
-          6: { points: '无会员体系', usage: '/', special: '/' },
-          7: { points: '成长值=包裹实际支付运费', usage: '实际支付的国际运费', special: '未形成完整会员体系' },
-          8: { points: '无会员体系', usage: '/', special: '/' },
-          9: { points: '积分累计自身消费金额', usage: '增加联盟佣金比例', special: '仅有运费折扣' }
+          1: { points: '1CNY运费=1积分，100积分=1元', usage: '可兑换商品、增值服务、运费折扣等', special: '可通过余额购买积分', image: '' },
+          2: { points: '无会员体系', usage: '/', special: '/', image: '' },
+          3: { points: '无会员体系', usage: '/', special: '/', image: '' },
+          4: { points: '运费每消费1元积1分', usage: '100积分=1元，可抵扣运费', special: '积分可叠加使用，有效期1年', image: '' },
+          5: { points: '无会员体系', usage: '/', special: '/', image: '' },
+          6: { points: '无会员体系', usage: '/', special: '/', image: '' },
+          7: { points: '成长值=包裹实际支付运费', usage: '实际支付的国际运费', special: '未形成完整会员体系', image: '' },
+          8: { points: '无会员体系', usage: '/', special: '/', image: '' },
+          9: { points: '积分累计自身消费金额', usage: '增加联盟佣金比例', special: '仅有运费折扣', image: '' }
         }
       },
       transshipment: {
         label: '转运服务',
         icon: Globe,
         data: {
-          1: { address: '无', requirements: '无' },
-          2: { address: '广东省惠州市惠城区三栋镇', requirements: '目的国家、快递单号、包裹名字' },
-          3: { address: '无', requirements: '无' },
-          4: { address: '广东省惠州市', requirements: '快递公司、单号、商品链接、类别、数量、单价、备注' },
-          5: { address: '福建省厦门市同安区五显镇', requirements: '快递单号、包裹名字' },
-          6: { address: '厦门市翔安区民安街道', requirements: '快递单号、包裹名字' },
-          7: { address: '福建省厦门市同安区埭头村', requirements: '快递单号、包裹名字' },
-          8: { address: '广东省惠州市', requirements: '物流公司、单号、商品名称、数量、类别、单价、备注' },
-          9: { address: '广东省河源市源城区埔前镇', requirements: '快递单号、备注' }
+          1: { address: '无', requirements: '无', image: '' },
+          2: { address: '广东省惠州市惠城区三栋镇', requirements: '目的国家、快递单号、包裹名字', image: '' },
+          3: { address: '无', requirements: '无', image: '' },
+          4: { address: '广东省惠州市', requirements: '快递公司、单号、商品链接、类别、数量、单价、备注', image: '' },
+          5: { address: '福建省厦门市同安区五显镇', requirements: '快递单号、包裹名字', image: '' },
+          6: { address: '厦门市翔安区民安街道', requirements: '快递单号、包裹名字', image: '' },
+          7: { address: '福建省厦门市同安区埭头村', requirements: '快递单号、包裹名字', image: '' },
+          8: { address: '广东省惠州市', requirements: '物流公司、单号、商品名称、数量、类别、单价、备注', image: '' },
+          9: { address: '广东省河源市源城区埔前镇', requirements: '快递单号、备注', image: '' }
         }
       },
       supportedPlatforms: {
         label: '支持链接平台',
         icon: Link,
         data: {
-          1: { platforms: ['淘宝', '1688', '微店'] },
-          2: { platforms: ['淘宝', '1688', '微店', '天猫国际'] },
-          3: { platforms: ['淘宝', '1688', '微店', '天猫国际'] },
-          4: { platforms: ['淘宝', '1688', '微店', '天猫国际', '京东', '闲鱼'] },
-          5: { platforms: ['淘宝', '1688', '微店', '天猫国际', '京东'] },
-          6: { platforms: ['淘宝', '1688', '微店', '天猫国际'] },
-          7: { platforms: ['淘宝', '1688', '微店', '天猫国际'] },
-          8: { platforms: ['淘宝', '1688', '微店', '天猫国际', '京东', '闲鱼'] },
-          9: { platforms: ['淘宝', '1688', '微店', '天猫国际'] }
+          1: { platforms: ['淘宝', '1688', '微店'], image: '' },
+          2: { platforms: ['淘宝', '1688', '微店', '天猫国际'], image: '' },
+          3: { platforms: ['淘宝', '1688', '微店', '天猫国际'], image: '' },
+          4: { platforms: ['淘宝', '1688', '微店', '天猫国际', '京东', '闲鱼'], image: '' },
+          5: { platforms: ['淘宝', '1688', '微店', '天猫国际', '京东'], image: '' },
+          6: { platforms: ['淘宝', '1688', '微店', '天猫国际'], image: '' },
+          7: { platforms: ['淘宝', '1688', '微店', '天猫国际'], image: '' },
+          8: { platforms: ['淘宝', '1688', '微店', '天猫国际', '京东', '闲鱼'], image: '' },
+          9: { platforms: ['淘宝', '1688', '微店', '天猫国际'], image: '' }
         }
       },
       app: {
         label: 'APP体验',
         icon: Smartphone,
         data: {
-          1: { systems: ['iOS', 'Android'], size: '88MB', languages: '10种语言，9种货币', features: '功能板块多，无乱码' },
-          2: { systems: ['iOS', 'Android'], size: '73MB', languages: '10种语言，10种货币', features: '基础功能' },
-          3: { systems: ['iOS'], size: '11.4MB', languages: '8种语言，5种货币', features: '功能不完善，仅苹果系统' },
-          4: { systems: ['iOS', 'Android'], size: '数据缺失', languages: '2种语言，2种货币', features: '语言和货币种类少' },
-          5: { systems: ['iOS', 'Android'], size: '108MB', languages: '8种语言，11种货币', features: '网页版没有APP二维码' },
-          6: { systems: ['无APP'], size: '/', languages: '/', features: '无APP' },
-          7: { systems: ['iOS', 'Android'], size: '数据缺失', languages: '9种语言，16种货币', features: '货币种类最多，版式舒服' },
-          8: { systems: ['iOS', 'Android'], size: '数据缺失', languages: '仅英语', features: '语言和货币种类少' },
-          9: { systems: ['iOS'], size: '82.6MB', languages: '2种语言', features: '内容简单，与电脑版相同' }
+          1: { systems: ['iOS', 'Android'], size: '88MB', languages: '10种语言，9种货币', features: '功能板块多，无乱码', image: '' },
+          2: { systems: ['iOS', 'Android'], size: '73MB', languages: '10种语言，10种货币', features: '基础功能', image: '' },
+          3: { systems: ['iOS'], size: '11.4MB', languages: '8种语言，5种货币', features: '功能不完善，仅苹果系统', image: '' },
+          4: { systems: ['iOS', 'Android'], size: '数据缺失', languages: '2种语言，2种货币', features: '语言和货币种类少', image: '' },
+          5: { systems: ['iOS', 'Android'], size: '108MB', languages: '8种语言，11种货币', features: '网页版没有APP二维码', image: '' },
+          6: { systems: ['无APP'], size: '/', languages: '/', features: '无APP', image: '' },
+          7: { systems: ['iOS', 'Android'], size: '数据缺失', languages: '9种语言，16种货币', features: '货币种类最多，版式舒服', image: '' },
+          8: { systems: ['iOS', 'Android'], size: '数据缺失', languages: '仅英语', features: '语言和货币种类少', image: '' },
+          9: { systems: ['iOS'], size: '82.6MB', languages: '2种语言', features: '内容简单，与电脑版相同', image: '' }
         }
       },
       valueAddedService: {
         label: '增值服务',
         icon: Plus,
         data: {
-          1: { free: '无', paid: '珍珠棉5元、折叠鞋盒3.5元、鞋撑10元、防撞角10元、抽真空20元、加固20元、拉伸膜15元', shipping: '无' },
-          2: { free: '无', paid: '折叠鞋盒3.5元、鞋撑10元、防撞角10元、抽真空20元、加固20元、拉伸膜15元', shipping: '无' },
-          3: { free: '无', paid: '拆除原包装1元', shipping: '无' },
-          4: { free: '去掉吊牌、去掉包装、极简包装', paid: 'EPE珍珠棉23元、防尘袋4元、珍珠棉包装4元、气泡袋3元、气泡柱5元、塑封10元、更改包装2元、拆分订单2元、商品视频20元、剪标3元', shipping: '优先出库10元、EPE泡沫填充3元/kg、纸护角5元/kg、拉伸膜4元/kg、木箱加固250元、防潮袋6元、个性化包装5元、真空压缩17元、折叠鞋盒5元' },
-          5: { free: '纸箱、简易包装、免费鞋撑', paid: '气泡膜4元/kg、防潮袋6元/kg、拉伸膜4元/kg、包装加固10元、角保护20元', shipping: '无' },
-          6: { free: '去标签、去外包装', paid: '鞋撑10元、气泡片5元、压缩袋15元、拉伸膜10元、防潮塑料袋5元、防撞护角10元', shipping: '无' },
-          7: { free: '纸箱包装、极简包装、移除鞋盒、拆除原包装(限时免费)', paid: '鞋撑5元、气泡膜5元、真空袋20元、防潮袋9元、拉伸膜4元/kg、包裹加固5元/kg、角保护8元', shipping: '无' },
-          8: { free: '纸箱包装、极简包装', paid: '金属鞋撑15元、真空袋15元、拉伸缠绕膜10元', shipping: '无' },
-          9: { free: '纸箱包装、极简包装', paid: '气泡片5元、压缩袋15元、防潮塑料袋5元、拉伸缠绕膜10元、防撞护角10元', shipping: '无' }
+          1: { free: '无', paid: '珍珠棉5元、折叠鞋盒3.5元、鞋撑10元、防撞角10元、抽真空20元、加固20元、拉伸膜15元', shipping: '无', image: '' },
+          2: { free: '无', paid: '折叠鞋盒3.5元、鞋撑10元、防撞角10元、抽真空20元、加固20元、拉伸膜15元', shipping: '无', image: '' },
+          3: { free: '无', paid: '拆除原包装1元', shipping: '无', image: '' },
+          4: { free: '去掉吊牌、去掉包装、极简包装', paid: 'EPE珍珠棉23元、防尘袋4元、珍珠棉包装4元、气泡袋3元、气泡柱5元、塑封10元、更改包装2元、拆分订单2元、商品视频20元、剪标3元', shipping: '优先出库10元、EPE泡沫填充3元/kg、纸护角5元/kg、拉伸膜4元/kg、木箱加固250元、防潮袋6元、个性化包装5元、真空压缩17元、折叠鞋盒5元', image: '' },
+          5: { free: '纸箱、简易包装、免费鞋撑', paid: '气泡膜4元/kg、防潮袋6元/kg、拉伸膜4元/kg、包装加固10元、角保护20元', shipping: '无', image: '' },
+          6: { free: '去标签、去外包装', paid: '鞋撑10元、气泡片5元、压缩袋15元、拉伸膜10元、防潮塑料袋5元、防撞护角10元', shipping: '无', image: '' },
+          7: { free: '纸箱包装、极简包装、移除鞋盒、拆除原包装(限时免费)', paid: '鞋撑5元、气泡膜5元、真空袋20元、防潮袋9元、拉伸膜4元/kg、包裹加固5元/kg、角保护8元', shipping: '无', image: '' },
+          8: { free: '纸箱包装、极简包装', paid: '金属鞋撑15元、真空袋15元、拉伸缠绕膜10元', shipping: '无', image: '' },
+          9: { free: '纸箱包装、极简包装', paid: '气泡片5元、压缩袋15元、防潮塑料袋5元、拉伸缠绕膜10元、防撞护角10元', shipping: '无', image: '' }
         }
       }
     };
@@ -435,10 +435,24 @@ function App() {
       setFormData(prev => ({ ...prev, [key]: value }));
     };
 
+    const handleImageChange = (e, key) => {
+      const file = e.target.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          handleChange(key, reader.result);
+        };
+        reader.onerror = () => console.error('图片读取失败');
+        reader.readAsDataURL(file);
+      } else {
+        alert('请上传图片文件！');
+      }
+    };
+
     return (
       <div className="space-y-4">
         {Object.keys(formData).map(key => (
-          <div key={key}>
+          <div key={key} className="flex flex-col">
             <label className="block text-sm font-medium text-gray-700">{key.charAt(0).toUpperCase() + key.slice(1)}</label>
             {Array.isArray(formData[key]) ? (
               <input
@@ -452,7 +466,7 @@ function App() {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={e => handleImageUpload(e, setFormData, key, sectionKey, platformId)}
+                  onChange={e => handleImageChange(e, key)}
                   className="mt-1"
                 />
                 {formData[key] && <img src={formData[key]} alt="Preview" className="mt-2 h-20 w-20 object-contain" />}
@@ -552,7 +566,7 @@ function App() {
         <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-white/20 mb-6">
           <div className="flex items-center justify-between mb-4 flex-col sm:flex-row gap-4">
             <h3 className="text-lg font-bold text-gray-900 flex items-center">
-              <Filter className="w-5 h-5 mr-2 text-blue-500" />
+              <Filter className="w-20 h-5 mr-2 text-blue-500" />
               选择对比平台
             </h3>
             <div className="flex space-x-2">
@@ -598,7 +612,7 @@ function App() {
                       onError={(e) => { e.target.src = '/default-favicon.png'; }}
                     />
                     {selectedPlatforms.includes(platform.id) ? (
-                      <span className="font-medium">{platform.name}</span> // 移除 <a> 标签，防止跳转
+                      <span className="font-medium">{platform.name}</span>
                     ) : (
                       <span className="font-medium">{platform.name}</span>
                     )}
