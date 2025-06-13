@@ -11,6 +11,7 @@ function App() {
   const [editMode, setEditMode] = useState(null);
   const [editPlatformId, setEditPlatformId] = useState(null);
   const [newPlatform, setNewPlatform] = useState({ name: '', url: '' });
+  const [previewImage, setPreviewImage] = useState(null); // 新增状态用于图片预览
 
   const [platforms, setPlatforms] = useState(() => {
     const saved = localStorage.getItem('platforms');
@@ -565,7 +566,7 @@ function App() {
               alt={`${key} Image`}
               className="h-40 w-40 object-contain rounded-lg border border-gray-200 shadow-md hover:scale-105 transition-transform cursor-pointer"
               loading="lazy"
-              onClick={() => window.open(data.image, '_blank')}
+              onClick={() => setPreviewImage(data.image)} // 点击触发预览
             />
             {isAdmin && (
               <button
@@ -773,7 +774,7 @@ function App() {
                       if (e.target.checked) {
                         setSelectedPlatforms([...selectedPlatforms, platform.id]);
                       } else {
-                        setSelectedPlatforms(selectedPlatforms.filter(id => id !== id));
+                        setSelectedPlatforms(selectedPlatforms.filter(id => id !== platform.id));
                       }
                     }}
                     className="sr-only"
@@ -1082,6 +1083,29 @@ function App() {
                 </table>
               </div>
             )}
+          </div>
+        )}
+
+        {/* 图片预览模态框 */}
+        {previewImage && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+            onClick={() => setPreviewImage(null)} // 点击背景关闭
+          >
+            <div className="relative">
+              <img
+                src={previewImage}
+                alt="Preview"
+                className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
+              />
+              <button
+                onClick={() => setPreviewImage(null)}
+                className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
+                title="关闭"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
           </div>
         )}
       </div>
