@@ -588,9 +588,13 @@ function App() {
                     {platform.logo && (
                       <img src={platform.logo} alt={platform.name} className="w-6 h-6 mr-2 object-contain" />
                     )}
-                    <a href={platform.url} target="_blank" rel="noopener noreferrer" className="font-medium hover:underline">
-                      {platform.name}
-                    </a>
+                    {selectedPlatforms.includes(platform.id) ? (
+                      <a href={platform.url} target="_blank" rel="noopener noreferrer" className="font-medium hover:underline">
+                        {platform.name}
+                      </a>
+                    ) : (
+                      <span className="font-medium">{platform.name}</span>
+                    )}
                   </div>
                 </label>
                 {isAdmin && (
