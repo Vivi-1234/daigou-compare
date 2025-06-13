@@ -3,7 +3,7 @@ import { ShoppingCart, CreditCard, Package, Star, Truck, MessageCircle, Users, C
 
 function App() {
   const [activeTab, setActiveTab] = useState('comparison');
-  const [selectedPlatforms, setSelectedPlatforms] = useState<number[]>([1, 2, 3, 4, 5, 6, 7, 8, 9]); // 显式类型
+  const [selectedPlatforms, setSelectedPlatforms] = useState<number[]>([1, 2, 3, 4, 5, 6, 7, 8, 9]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminPassword, setAdminPassword] = useState('');
   const [showAdminModal, setShowAdminModal] = useState(false);
@@ -594,7 +594,7 @@ function App() {
                       src={getFaviconUrl(platform.url)}
                       alt={`${platform.name} favicon`}
                       className="w-6 h-6 mr-2 object-contain"
-                      onError={(e) => { e.target.src = '/default-favicon.png'; }} // 默认占位符
+                      onError={(e) => { e.target.src = '/default-favicon.png'; }}
                     />
                     {selectedPlatforms.includes(platform.id) ? (
                       <a href={platform.url} target="_blank" rel="noopener noreferrer" className="font-medium hover:underline">
