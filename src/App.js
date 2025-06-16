@@ -179,6 +179,17 @@ function App() {
   const [fieldConfigs, setFieldConfigs] = useState({});
   const [showNewSectionModal, setShowNewSectionModal] = useState(false);
   const [newSection, setNewSection] = useState({ key: '', label: '', icon: 'Package' });
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+
+  // 显示成功提示
+  const showToast = (message) => {
+    setToastMessage(message);
+    setShowSuccessToast(true);
+    setTimeout(() => {
+      setShowSuccessToast(false);
+    }, 3000);
+  };
 
   // 可选图标列表
   const iconOptions = [
@@ -382,7 +393,7 @@ function App() {
 
   const handleAddPlatform = async () => {
     if (!newPlatform.name || !newPlatform.url) {
-      alert('请输入平台名称和URL');
+      showToast('请输入平台名称和URL');
       return;
     }
 
@@ -411,12 +422,11 @@ function App() {
         });
         
         setNewPlatform({ name: '', url: '' });
-        alert('平台添加成功！');
-        // 移除 await loadData(); - 不需要重新加载整个页面
+        showToast('平台添加成功！');
       }
     } catch (error) {
       console.error('添加平台失败:', error);
-      alert('添加平台失败');
+      showToast('添加平台失败');
     }
   };
 
@@ -869,13 +879,13 @@ function App() {
         await handleAddFieldToAllPlatforms(sectionKey, newFieldKey, newFieldLabel, newFieldType);
         setNewFieldLabel('');
         setNewFieldType('text');
-        alert('字段添加成功！已同步到所有平台');
+        showToast('字段添加成功！已同步到所有平台');
         
         // 手动更新当前编辑表单的字段配置，避免页面刷新
         window.location.reload(); // 临时刷新以显示新字段，后续可以优化为局部更新
       } catch (error) {
         console.error('添加字段失败:', error);
-        alert('添加字段失败');
+        showToast('添加字段失败');
       }
     };
 
@@ -1436,6 +1446,17 @@ function App() {
           </div>
         )}
       </div>
+
+      {/* 添加 CSS 动画样式 */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 }
