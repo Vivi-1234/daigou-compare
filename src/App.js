@@ -298,7 +298,6 @@ function App() {
 
   const handleSaveEdit = async (sectionKey, id, updatedData) => {
     try {
-      const currentData = platformData[sectionKey].data[id] || {};
       await supabase.upsertPlatformData(sectionKey, id, updatedData);
       
       setPlatformData(prev => {
@@ -625,6 +624,18 @@ function App() {
     const [formData, setFormData] = useState(() => ({ ...platformData[sectionKey].data[platformId] }));
     const [customFields, setCustomFields] = useState(Object.keys(formData).map(key => ({ key, label: key.charAt(0).toUpperCase() + key.slice(1), type: key === 'image' ? 'image' : 'text' })));
 
+    useEffect(() => {
+      setFormData(prev => {
+        const newData = { ...prev };
+        customFields.forEach(field => {
+          if (!Object.keys(newData).includes(field.key)) {
+            newData[field.key] = '';
+          }
+        });
+        return newData;
+      });
+    }, [customFields]);
+
     const handleChange = (key, value) => {
       setFormData(prev => ({ ...prev, [key]: value }));
     };
@@ -650,17 +661,16 @@ function App() {
           delete newData[keyToDelete];
           return newData;
         });
-        onSave(formData); // 直接调用 onSave 保存更改
       }
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
       // 清理多余字段，只保留 customFields 中定义的字段
       const cleanedData = {};
       customFields.forEach(field => {
-        cleanedData[field.key] = formData[field.key];
+        cleanedData[field.key] = formData[field.key] || '';
       });
-      onSave(cleanedData); // 保存清理后的数据
+      await onSave(cleanedData);
     };
 
     return (
