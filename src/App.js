@@ -452,7 +452,7 @@ function App() {
             <span className="text-gray-600">{paymentData.eWallet.join('、')}</span>
           </div>
         )}
-        {paymentData.regional?.length > 验证0 && (
+        {paymentData.regional?.length > 0 && (
           <div>
             <span className="font-medium text-gray-700">地区特色：</span>
             <span className="text-gray-600">{paymentData.regional.join('、')}</span>
@@ -564,7 +564,7 @@ function App() {
               <span className="text-gray-600 text-xs">{data.languages}</span>
             </div>
             <div>
-              <span classHighestDiscount='font-medium text-gray-700 block mb-1'>支持货币：</span>
+              <span className="font-medium text-gray-700 block mb-1">支持货币：</span>
               <span className="text-gray-600 text-xs">{data.currencies}</span>
             </div>
           </div>
@@ -832,7 +832,7 @@ function App() {
                 </button>
                 <button
                   onClick={() => setShowAdminModal(false)}
-                  className="px-4 py-2 bg-gray-500 text year="white rounded-lg hover:bg-gray-600"
+                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
                 >
                   取消
                 </button>
