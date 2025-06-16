@@ -299,18 +299,11 @@ function App() {
   const handleSaveEdit = async (sectionKey, id, updatedData) => {
     try {
       const currentData = platformData[sectionKey].data[id] || {};
-      const mergedData = { ...currentData, ...updatedData };
-      Object.keys(mergedData).forEach(key => {
-        if (!customFields.some(field => field.key === key)) {
-          delete mergedData[key]; // 移除不在 customFields 中的字段
-        }
-      });
-
-      await supabase.upsertPlatformData(sectionKey, id, mergedData);
+      await supabase.upsertPlatformData(sectionKey, id, updatedData);
       
       setPlatformData(prev => {
         const newData = { ...prev };
-        newData[sectionKey].data[id] = mergedData;
+        newData[sectionKey].data[id] = updatedData;
         return newData;
       });
       
@@ -657,8 +650,17 @@ function App() {
           delete newData[keyToDelete];
           return newData;
         });
-        onSave({ ...formData, [keyToDelete]: undefined }); // 立即保存更改
+        onSave(formData); // 直接调用 onSave 保存更改
       }
+    };
+
+    const handleSave = () => {
+      // 清理多余字段，只保留 customFields 中定义的字段
+      const cleanedData = {};
+      customFields.forEach(field => {
+        cleanedData[field.key] = formData[field.key];
+      });
+      onSave(cleanedData); // 保存清理后的数据
     };
 
     return (
@@ -729,7 +731,7 @@ function App() {
         )}
         <div className="flex space-x-2">
           <button
-            onClick={() => onSave(formData)}
+            onClick={handleSave}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
           >
             <Save className="w-4 h-4 inline mr-1" /> 保存
