@@ -412,7 +412,7 @@ function App() {
         
         setNewPlatform({ name: '', url: '' });
         alert('平台添加成功！');
-        await loadData();
+        // 移除 await loadData(); - 不需要重新加载整个页面
       }
     } catch (error) {
       console.error('添加平台失败:', error);
@@ -649,6 +649,19 @@ function App() {
         display_order: maxOrder + 1
       });
 
+      // 更新字段配置状态
+      setFieldConfigs(prev => ({
+        ...prev,
+        [sectionKey]: {
+          ...prev[sectionKey],
+          [fieldKey]: {
+            label: fieldLabel,
+            type: fieldType,
+            displayOrder: maxOrder + 1
+          }
+        }
+      }));
+
       // 更新所有平台的数据
       const promises = platforms.map(platform => {
         const currentData = { ...platformData[sectionKey].data[platform.id] };
@@ -657,10 +670,22 @@ function App() {
       });
 
       await Promise.all(promises);
-      await loadData();
+      
+      // 更新本地平台数据状态
+      setPlatformData(prev => {
+        const updated = { ...prev };
+        platforms.forEach(platform => {
+          if (updated[sectionKey] && updated[sectionKey].data[platform.id]) {
+            updated[sectionKey].data[platform.id][fieldKey] = fieldType === 'image' ? '' : '';
+          }
+        });
+        return updated;
+      });
+      
+      // 移除 await loadData(); - 不需要重新加载整个页面
     } catch (error) {
       console.error('添加字段失败:', error);
-      alert('添加字段失败');
+      throw error;
     }
   };
 
@@ -845,6 +870,9 @@ function App() {
         setNewFieldLabel('');
         setNewFieldType('text');
         alert('字段添加成功！已同步到所有平台');
+        
+        // 手动更新当前编辑表单的字段配置，避免页面刷新
+        window.location.reload(); // 临时刷新以显示新字段，后续可以优化为局部更新
       } catch (error) {
         console.error('添加字段失败:', error);
         alert('添加字段失败');
