@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, CreditCard, Package, Star, Truck, MessageCircle, Users, Clock, Gift, Globe, Percent, Award, ArrowUpDown, Link, Smartphone, Plus, Filter, Eye, ChevronDown, ChevronUp, Edit, Trash, Save, X, Crown, Settings, Download, Upload, Loader } from 'lucide-react';
+import { 
+  ShoppingCart, CreditCard, Package, Star, Truck, MessageCircle, Users, Clock, Gift, Globe, 
+  Percent, Award, ArrowUpDown, Link, Smartphone, Plus, Filter, Eye, ChevronDown, ChevronUp, 
+  Edit, Trash, Save, X, Crown, Settings, Download, Upload, Loader 
+} from 'lucide-react';
 
 // Supabase 配置
 const SUPABASE_URL = 'https://aixsyqgmkogxmnhmweil.supabase.co';
@@ -35,7 +39,6 @@ class SupabaseClient {
     return text ? JSON.parse(text) : null;
   }
 
-  // 平台操作
   async getPlatforms() {
     return this.request('/platforms?select=*&order=id');
   }
@@ -52,13 +55,11 @@ class SupabaseClient {
     return this.request(`/platforms?id=eq.${id}`, { method: 'DELETE' });
   }
 
-  // 平台数据操作
   async getPlatformData() {
     return this.request('/platform_data?select=*');
   }
 
   async upsertPlatformData(sectionKey, platformId, data) {
-    // 先尝试更新
     const existing = await this.request(`/platform_data?section_key=eq.${sectionKey}&platform_id=eq.${platformId}&select=id`);
     
     if (existing && existing.length > 0) {
@@ -74,7 +75,6 @@ class SupabaseClient {
     }
   }
 
-  // 优势平台操作
   async getAdvantagePlatforms() {
     return this.request('/advantage_platforms?select=*');
   }
@@ -95,7 +95,6 @@ class SupabaseClient {
     }
   }
 
-  // 图片上传
   async uploadImage(file, path) {
     const formData = new FormData();
     formData.append('file', file);
@@ -115,7 +114,6 @@ class SupabaseClient {
     return `${this.url}/storage/v1/object/public/platform-images/${path}`;
   }
 
-  // 删除图片
   async deleteImage(path) {
     await fetch(`${this.url}/storage/v1/object/platform-images/${path}`, {
       method: 'DELETE',
@@ -144,101 +142,27 @@ function App() {
   const [platforms, setPlatforms] = useState([]);
   const [platformData, setPlatformData] = useState({});
 
-  // 默认数据结构
   const defaultSections = {
-    accountVerification: {
-      label: '账户验证方式',
-      icon: Users,
-      defaultData: { method: '', issues: '', verificationInterface: '', image: '' }
-    },
-    payment: {
-      label: '支付方式',
-      icon: CreditCard,
-      defaultData: { creditCard: [], eWallet: [], regional: [], other: [], image: '' }
-    },
-    storage: {
-      label: '保管期',
-      icon: Package,
-      defaultData: { free: '', extended: '', image: '' }
-    },
-    qc: {
-      label: 'QC质检',
-      icon: Star,
-      defaultData: { free: '', extra: '', quality: '', image: '' }
-    },
-    shipping: {
-      label: '运费与保险',
-      icon: Truck,
-      defaultData: { rehearsal: '', seizure: '', loss: '', delay: '', image: '' }
-    },
-    customerService: {
-      label: '客服支持',
-      icon: MessageCircle,
-      defaultData: { hours: '', days: '', response: '', image: '' }
-    },
-    discord: {
-      label: 'Discord社区',
-      icon: Users,
-      defaultData: { members: '', activities: '', rewards: '', referral: '', dcLink: '', image: '' }
-    },
-    timing: {
-      label: '时效',
-      icon: Clock,
-      defaultData: { accept: '', purchase: '', shipping: '', arrival: '', qc: '', image: '' }
-    },
-    coupon: {
-      label: '优惠券',
-      icon: Gift,
-      defaultData: { amount: '', type: '', threshold: '', maxDiscount: '', stackable: '', image: '' }
-    },
-    language: {
-      label: '语言与货币',
-      icon: Globe,
-      defaultData: { languages: '', currencies: '', image: '' }
-    },
-    commission: {
-      label: '联盟佣金',
-      icon: Percent,
-      defaultData: { base: '', max: '', mechanism: '', image: '' }
-    },
-    membership: {
-      label: '会员体系',
-      icon: Award,
-      defaultData: { points: '', usage: '', special: '', image: '' }
-    },
-    transshipment: {
-      label: '转运服务',
-      icon: Globe,
-      defaultData: { address: '', requirements: '', image: '' }
-    },
-    supportedPlatforms: {
-      label: '支持链接平台',
-      icon: Link,
-      defaultData: { platforms: [], image: '' }
-    },
-    app: {
-      label: 'APP体验',
-      icon: Smartphone,
-      defaultData: { systems: [], size: '', languages: '', features: '', image: '' }
-    },
-    valueAddedService: {
-      label: '增值服务',
-      icon: Plus,
-      defaultData: { free: '', paid: '', shipping: '', image: '' }
-    },
-    customLogistics: {
-      label: '定制物流',
-      icon: Settings,
-      defaultData: { hasService: '', needInfo: '', tips: '', feeDescription: '', displayInterface: '', image: '' }
-    },
-    afterSales: {
-      label: '售后',
-      icon: MessageCircle,
-      defaultData: { returnFee: '', returnTime: '', processingTime: '', image: '' }
-    }
+    accountVerification: { label: '账户验证方式', icon: Users, defaultData: { method: '', issues: '', verificationInterface: '', image: '' } },
+    payment: { label: '支付方式', icon: CreditCard, defaultData: { creditCard: [], eWallet: [], regional: [], other: [], image: '' } },
+    storage: { label: '保管期', icon: Package, defaultData: { free: '', extended: '', image: '' } },
+    qc: { label: 'QC质检', icon: Star, defaultData: { free: '', extra: '', quality: '', image: '' } },
+    shipping: { label: '运费与保险', icon: Truck, defaultData: { rehearsal: '', seizure: '', loss: '', delay: '', image: '' } },
+    customerService: { label: '客服支持', icon: MessageCircle, defaultData: { hours: '', days: '', response: '', image: '' } },
+    discord: { label: 'Discord社区', icon: Users, defaultData: { members: '', activities: '', rewards: '', referral: '', dcLink: '', image: '' } },
+    timing: { label: '时效', icon: Clock, defaultData: { accept: '', purchase: '', shipping: '', arrival: '', qc: '', image: '' } },
+    coupon: { label: '优惠券', icon: Gift, defaultData: { amount: '', type: '', threshold: '', maxDiscount: '', stackable: '', image: '' } },
+    language: { label: '语言与货币', icon: Globe, defaultData: { languages: '', currencies: '', image: '' } },
+    commission: { label: '联盟佣金', icon: Percent, defaultData: { base: '', max: '', mechanism: '', image: '' } },
+    membership: { label: '会员体系', icon: Award, defaultData: { points: '', usage: '', special: '', image: '' } },
+    transshipment: { label: '转运服务', icon: Globe, defaultData: { address: '', requirements: '', image: '' } },
+    supportedPlatforms: { label: '支持链接平台', icon: Link, defaultData: { platforms: [], image: '' } },
+    app: { label: 'APP体验', icon: Smartphone, defaultData: { systems: [], size: '', languages: '', features: '', image: '' } },
+    valueAddedService: { label: '增值服务', icon: Plus, defaultData: { free: '', paid: '', shipping: '', image: '' } },
+    customLogistics: { label: '定制物流', icon: Settings, defaultData: { hasService: '', needInfo: '', tips: '', feeDescription: '', displayInterface: '', image: '' } },
+    afterSales: { label: '售后', icon: MessageCircle, defaultData: { returnFee: '', returnTime: '', processingTime: '', image: '' } }
   };
 
-  // 初始化数据
   useEffect(() => {
     loadData();
   }, []);
@@ -247,30 +171,24 @@ function App() {
     try {
       setLoading(true);
       
-      // 加载平台
       const platformsData = await supabase.getPlatforms();
       setPlatforms(platformsData || []);
       setSelectedPlatforms((platformsData || []).map(p => p.id));
 
-      // 加载平台数据
       const platformDataRows = await supabase.getPlatformData();
       const formattedData = {};
       
-      // 初始化所有板块
       Object.keys(defaultSections).forEach(sectionKey => {
         formattedData[sectionKey] = {
           label: defaultSections[sectionKey].label,
           icon: defaultSections[sectionKey].icon,
           data: {}
         };
-        
-        // 为每个平台初始化默认数据
         (platformsData || []).forEach(platform => {
           formattedData[sectionKey].data[platform.id] = { ...defaultSections[sectionKey].defaultData };
         });
       });
 
-      // 填充实际数据
       if (platformDataRows) {
         platformDataRows.forEach(row => {
           if (formattedData[row.section_key]) {
@@ -281,7 +199,6 @@ function App() {
 
       setPlatformData(formattedData);
 
-      // 加载优势平台
       const advantageData = await supabase.getAdvantagePlatforms();
       const formattedAdvantage = {};
       if (advantageData) {
@@ -331,19 +248,17 @@ function App() {
         setPlatforms(prev => [...prev, created]);
         setSelectedPlatforms(prev => [...prev, created.id]);
         
-        // 为新平台初始化所有板块的数据
         setPlatformData(prev => {
           const updated = { ...prev };
           Object.keys(defaultSections).forEach(sectionKey => {
-            if (updated[sectionKey]) {
-              updated[sectionKey].data[created.id] = { ...defaultSections[sectionKey].defaultData };
-            }
+            updated[sectionKey].data[created.id] = { ...defaultSections[sectionKey].defaultData };
           });
           return updated;
         });
         
         setNewPlatform({ name: '', url: '' });
         alert('平台添加成功！');
+        await loadData(); // 重新加载数据
       }
     } catch (error) {
       console.error('添加平台失败:', error);
@@ -359,18 +274,16 @@ function App() {
         setPlatforms(prev => prev.filter(p => p.id !== id));
         setSelectedPlatforms(prev => prev.filter(pId => pId !== id));
         
-        // 从本地数据中移除
         setPlatformData(prev => {
           const updated = { ...prev };
           Object.keys(updated).forEach(sectionKey => {
-            if (updated[sectionKey].data) {
-              delete updated[sectionKey].data[id];
-            }
+            delete updated[sectionKey].data[id];
           });
           return updated;
         });
         
         alert('平台删除成功！');
+        await loadData(); // 重新加载数据
       } catch (error) {
         console.error('删除平台失败:', error);
         alert('删除平台失败');
@@ -385,17 +298,26 @@ function App() {
 
   const handleSaveEdit = async (sectionKey, id, updatedData) => {
     try {
-      await supabase.upsertPlatformData(sectionKey, id, updatedData);
+      const currentData = platformData[sectionKey].data[id] || {};
+      const mergedData = { ...currentData, ...updatedData };
+      Object.keys(mergedData).forEach(key => {
+        if (!customFields.some(field => field.key === key)) {
+          delete mergedData[key]; // 移除不在 customFields 中的字段
+        }
+      });
+
+      await supabase.upsertPlatformData(sectionKey, id, mergedData);
       
       setPlatformData(prev => {
         const newData = { ...prev };
-        newData[sectionKey].data[id] = updatedData;
+        newData[sectionKey].data[id] = mergedData;
         return newData;
       });
       
       setEditMode(null);
       setEditPlatformId(null);
       alert('数据保存成功！');
+      await loadData(); // 重新加载数据
     } catch (error) {
       console.error('保存数据失败:', error);
       alert('保存数据失败');
@@ -443,14 +365,11 @@ function App() {
       
       const imageUrl = await supabase.uploadImage(file, fileName);
       
-      // 更新本地数据
       const currentData = { ...platformData[sectionKey].data[platformId] };
       currentData[fieldKey] = imageUrl;
       
-      // 保存到数据库
       await supabase.upsertPlatformData(sectionKey, platformId, currentData);
       
-      // 更新状态
       setPlatformData(prev => {
         const updated = { ...prev };
         updated[sectionKey].data[platformId] = currentData;
@@ -458,6 +377,7 @@ function App() {
       });
       
       alert('图片上传成功！');
+      await loadData(); // 重新加载数据
     } catch (error) {
       console.error('图片上传失败:', error);
       alert('图片上传失败');
@@ -470,7 +390,6 @@ function App() {
         const currentData = { ...platformData[sectionKey].data[platformId] };
         const oldImageUrl = currentData[fieldKey];
         
-        // 从 URL 中提取文件路径
         if (oldImageUrl && oldImageUrl.includes('/platform-images/')) {
           const path = oldImageUrl.split('/platform-images/')[1];
           await supabase.deleteImage(path);
@@ -478,10 +397,8 @@ function App() {
         
         currentData[fieldKey] = '';
         
-        // 保存到数据库
         await supabase.upsertPlatformData(sectionKey, platformId, currentData);
         
-        // 更新状态
         setPlatformData(prev => {
           const updated = { ...prev };
           updated[sectionKey].data[platformId] = currentData;
@@ -489,6 +406,7 @@ function App() {
         });
         
         alert('图片删除成功！');
+        await loadData(); // 重新加载数据
       } catch (error) {
         console.error('删除图片失败:', error);
         alert('删除图片失败');
@@ -739,6 +657,7 @@ function App() {
           delete newData[keyToDelete];
           return newData;
         });
+        onSave({ ...formData, [keyToDelete]: undefined }); // 立即保存更改
       }
     };
 
@@ -1154,7 +1073,6 @@ function App() {
                           </td>
                         ))}
                     </tr>
-
                     <tr className="border-b border-gray-200">
                       <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-white">
                         免费保管期
@@ -1167,7 +1085,6 @@ function App() {
                           </td>
                         ))}
                     </tr>
-
                     <tr className="border-b border-gray-200 bg-gray-50">
                       <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-gray-50">
                         免费QC张数
@@ -1180,7 +1097,6 @@ function App() {
                           </td>
                         ))}
                     </tr>
-
                     <tr className="border-b border-gray-200">
                       <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-white">
                         额外QC价格
@@ -1193,7 +1109,6 @@ function App() {
                           </td>
                         ))}
                     </tr>
-
                     <tr className="border-b border-gray-200 bg-gray-50">
                       <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-gray-50">
                         预演包裹费
@@ -1206,7 +1121,6 @@ function App() {
                           </td>
                         ))}
                     </tr>
-
                     <tr className="border-b border-gray-200">
                       <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-white">
                         客服时间
@@ -1219,7 +1133,6 @@ function App() {
                           </td>
                         ))}
                     </tr>
-
                     <tr className="border-b border-gray-200 bg-gray-50">
                       <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-gray-50">
                         Discord人数
@@ -1232,7 +1145,6 @@ function App() {
                           </td>
                         ))}
                     </tr>
-
                     <tr className="border-b border-gray-200">
                       <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-white">
                         优惠金额
@@ -1245,7 +1157,6 @@ function App() {
                           </td>
                         ))}
                     </tr>
-
                     <tr className="border-b border-gray-200 bg-gray-50">
                       <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-gray-50">
                         支持语言数
@@ -1258,7 +1169,6 @@ function App() {
                           </td>
                         ))}
                     </tr>
-
                     <tr className="border-b border-gray-200">
                       <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-white">
                         支持货币数
