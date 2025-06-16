@@ -95,6 +95,40 @@ class SupabaseClient {
     }
   }
 
+  // 新增：板块配置相关API
+  async getSectionConfigs() {
+    return this.request('/section_configs?select=*&order=display_order');
+  }
+
+  async createSectionConfig(config) {
+    return this.request('/section_configs', {
+      method: 'POST',
+      body: JSON.stringify(config),
+      headers: { 'Prefer': 'return=representation' }
+    });
+  }
+
+  async deleteSectionConfig(sectionKey) {
+    return this.request(`/section_configs?section_key=eq.${sectionKey}`, { method: 'DELETE' });
+  }
+
+  // 新增：字段配置相关API
+  async getFieldConfigs() {
+    return this.request('/field_configs?select=*&order=section_key,display_order');
+  }
+
+  async createFieldConfig(config) {
+    return this.request('/field_configs', {
+      method: 'POST',
+      body: JSON.stringify(config),
+      headers: { 'Prefer': 'return=representation' }
+    });
+  }
+
+  async deleteFieldConfig(sectionKey, fieldKey) {
+    return this.request(`/field_configs?section_key=eq.${sectionKey}&field_key=eq.${fieldKey}`, { method: 'DELETE' });
+  }
+
   async uploadImage(file, path) {
     const formData = new FormData();
     formData.append('file', file);
@@ -141,26 +175,97 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [platforms, setPlatforms] = useState([]);
   const [platformData, setPlatformData] = useState({});
+  const [sectionConfigs, setSectionConfigs] = useState({});
+  const [fieldConfigs, setFieldConfigs] = useState({});
+  const [showNewSectionModal, setShowNewSectionModal] = useState(false);
+  const [newSection, setNewSection] = useState({ key: '', label: '', icon: 'Package' });
 
-  const defaultSections = {
-    accountVerification: { label: '账户验证方式', icon: Users, defaultData: { method: '', issues: '', verificationInterface: '', image: '' } },
-    payment: { label: '支付方式', icon: CreditCard, defaultData: { creditCard: [], eWallet: [], regional: [], other: [], image: '' } },
-    storage: { label: '保管期', icon: Package, defaultData: { free: '', extended: '', image: '' } },
-    qc: { label: 'QC质检', icon: Star, defaultData: { free: '', extra: '', quality: '', image: '' } },
-    shipping: { label: '运费与保险', icon: Truck, defaultData: { rehearsal: '', seizure: '', loss: '', delay: '', image: '' } },
-    customerService: { label: '客服支持', icon: MessageCircle, defaultData: { hours: '', days: '', response: '', image: '' } },
-    discord: { label: 'Discord社区', icon: Users, defaultData: { members: '', activities: '', rewards: '', referral: '', dcLink: '', image: '' } },
-    timing: { label: '时效', icon: Clock, defaultData: { accept: '', purchase: '', shipping: '', arrival: '', qc: '', image: '' } },
-    coupon: { label: '优惠券', icon: Gift, defaultData: { amount: '', type: '', threshold: '', maxDiscount: '', stackable: '', image: '' } },
-    language: { label: '语言与货币', icon: Globe, defaultData: { languages: '', currencies: '', image: '' } },
-    commission: { label: '联盟佣金', icon: Percent, defaultData: { base: '', max: '', mechanism: '', image: '' } },
-    membership: { label: '会员体系', icon: Award, defaultData: { points: '', usage: '', special: '', image: '' } },
-    transshipment: { label: '转运服务', icon: Globe, defaultData: { address: '', requirements: '', image: '' } },
-    supportedPlatforms: { label: '支持链接平台', icon: Link, defaultData: { platforms: [], image: '' } },
-    app: { label: 'APP体验', icon: Smartphone, defaultData: { systems: [], size: '', languages: '', features: '', image: '' } },
-    valueAddedService: { label: '增值服务', icon: Plus, defaultData: { free: '', paid: '', shipping: '', image: '' } },
-    customLogistics: { label: '定制物流', icon: Settings, defaultData: { hasService: '', needInfo: '', tips: '', feeDescription: '', displayInterface: '', image: '' } },
-    afterSales: { label: '售后', icon: MessageCircle, defaultData: { returnFee: '', returnTime: '', processingTime: '', image: '' } }
+  // 可选图标列表
+  const iconOptions = [
+    { value: 'CreditCard', label: '信用卡', component: CreditCard },
+    { value: 'Package', label: '包裹', component: Package },
+    { value: 'Star', label: '星星', component: Star },
+    { value: 'Truck', label: '卡车', component: Truck },
+    { value: 'MessageCircle', label: '消息', component: MessageCircle },
+    { value: 'Users', label: '用户', component: Users },
+    { value: 'Clock', label: '时钟', component: Clock },
+    { value: 'Gift', label: '礼物', component: Gift },
+    { value: 'Globe', label: '全球', component: Globe },
+    { value: 'Percent', label: '百分比', component: Percent },
+    { value: 'Award', label: '奖励', component: Award },
+    { value: 'Link', label: '链接', component: Link },
+    { value: 'Smartphone', label: '手机', component: Smartphone },
+    { value: 'Settings', label: '设置', component: Settings }
+  ];
+
+  // 字段类型中文映射
+  const fieldTypeLabels = {
+    'method': '验证方式',
+    'issues': '体验问题',
+    'verificationInterface': '验证界面',
+    'image': '图片',
+    'creditCard': '信用卡/借记卡',
+    'eWallet': '电子钱包',
+    'regional': '地区特色',
+    'other': '其他',
+    'free': '免费保管期',
+    'extended': '延长存储',
+    'extra': '额外QC价格',
+    'quality': '照片质量',
+    'rehearsal': '预演包裹费',
+    'seizure': '海关扣押险',
+    'loss': '丢失/损坏险',
+    'delay': '延迟险',
+    'hours': '工作时间',
+    'days': '工作日',
+    'response': '响应时间',
+    'members': '社区人数',
+    'activities': '活动频率',
+    'rewards': '奖励形式',
+    'referral': '拉新奖励',
+    'dcLink': 'DC链接',
+    'accept': '接单时间',
+    'purchase': '采购时间',
+    'shipping': '卖家发货',
+    'arrival': '到仓时间',
+    'qc': '质检上架',
+    'amount': '优惠金额',
+    'type': '券码类型',
+    'threshold': '使用门槛',
+    'maxDiscount': '最高折扣',
+    'stackable': '叠加使用',
+    'languages': '支持语言',
+    'currencies': '支持货币',
+    'base': '基础佣金',
+    'max': '最高佣金',
+    'mechanism': '计算机制',
+    'points': '积分获取',
+    'usage': '积分使用',
+    'special': '特色功能',
+    'address': '转运地址',
+    'requirements': '信息要求',
+    'platforms': '支持平台',
+    'systems': '支持系统',
+    'size': '安装包大小',
+    'features': '特色功能',
+    'paid': '收费服务',
+    'hasService': '是否有定制物流',
+    'needInfo': '需要填写的信息',
+    'tips': '提示信息',
+    'feeDescription': '费用说明',
+    'displayInterface': '展示界面',
+    'returnFee': '商品退换货费用',
+    'returnTime': '商品退换货官方时效',
+    'processingTime': '包裹售后处理时间'
+  };
+
+  const getFieldLabel = (fieldKey) => {
+    return fieldTypeLabels[fieldKey] || fieldKey;
+  };
+
+  const getIconComponent = (iconName) => {
+    const iconOption = iconOptions.find(opt => opt.value === iconName);
+    return iconOption ? iconOption.component : Package;
   };
 
   useEffect(() => {
@@ -172,21 +277,60 @@ function App() {
     try {
       setLoading(true);
       
+      // 加载平台数据
       const platformsData = await supabase.getPlatforms();
       setPlatforms(platformsData || []);
       setSelectedPlatforms((platformsData || []).map(p => p.id));
 
+      // 加载板块配置
+      const sectionsData = await supabase.getSectionConfigs();
+      const sectionsConfig = {};
+      if (sectionsData) {
+        sectionsData.forEach(section => {
+          sectionsConfig[section.section_key] = {
+            label: section.label,
+            icon: getIconComponent(section.icon_name),
+            displayOrder: section.display_order
+          };
+        });
+      }
+      setSectionConfigs(sectionsConfig);
+
+      // 加载字段配置
+      const fieldsData = await supabase.getFieldConfigs();
+      const fieldsConfig = {};
+      if (fieldsData) {
+        fieldsData.forEach(field => {
+          if (!fieldsConfig[field.section_key]) {
+            fieldsConfig[field.section_key] = {};
+          }
+          fieldsConfig[field.section_key][field.field_key] = {
+            label: field.label,
+            type: field.field_type,
+            displayOrder: field.display_order
+          };
+        });
+      }
+      setFieldConfigs(fieldsConfig);
+
+      // 加载平台数据
       const platformDataRows = await supabase.getPlatformData();
       const formattedData = {};
       
-      Object.keys(defaultSections).forEach(sectionKey => {
+      Object.keys(sectionsConfig).forEach(sectionKey => {
         formattedData[sectionKey] = {
-          label: defaultSections[sectionKey].label,
-          icon: defaultSections[sectionKey].icon,
+          label: sectionsConfig[sectionKey].label,
+          icon: sectionsConfig[sectionKey].icon,
           data: {}
         };
         (platformsData || []).forEach(platform => {
-          formattedData[sectionKey].data[platform.id] = { ...defaultSections[sectionKey].defaultData };
+          formattedData[sectionKey].data[platform.id] = {};
+          // 根据字段配置初始化数据
+          if (fieldsConfig[sectionKey]) {
+            Object.keys(fieldsConfig[sectionKey]).forEach(fieldKey => {
+              formattedData[sectionKey].data[platform.id][fieldKey] = '';
+            });
+          }
         });
       });
 
@@ -200,6 +344,7 @@ function App() {
       console.log('Loaded platformData:', formattedData);
       setPlatformData(formattedData);
 
+      // 加载优势标记
       const advantageData = await supabase.getAdvantagePlatforms();
       const formattedAdvantage = {};
       if (advantageData) {
@@ -248,17 +393,26 @@ function App() {
         setPlatforms(prev => [...prev, created]);
         setSelectedPlatforms(prev => [...prev, created.id]);
         
+        // 为新平台初始化所有板块的数据
         setPlatformData(prev => {
           const updated = { ...prev };
-          Object.keys(defaultSections).forEach(sectionKey => {
-            updated[sectionKey].data[created.id] = { ...defaultSections[sectionKey].defaultData };
+          Object.keys(sectionConfigs).forEach(sectionKey => {
+            if (updated[sectionKey]) {
+              updated[sectionKey].data[created.id] = {};
+              // 根据字段配置初始化数据
+              if (fieldConfigs[sectionKey]) {
+                Object.keys(fieldConfigs[sectionKey]).forEach(fieldKey => {
+                  updated[sectionKey].data[created.id][fieldKey] = '';
+                });
+              }
+            }
           });
           return updated;
         });
         
         setNewPlatform({ name: '', url: '' });
         alert('平台添加成功！');
-        await loadData(); // 重新加载数据
+        await loadData();
       }
     } catch (error) {
       console.error('添加平台失败:', error);
@@ -283,7 +437,7 @@ function App() {
         });
         
         alert('平台删除成功！');
-        await loadData(); // 重新加载数据
+        await loadData();
       } catch (error) {
         console.error('删除平台失败:', error);
         alert('删除平台失败');
@@ -310,7 +464,7 @@ function App() {
       setEditMode(null);
       setEditPlatformId(null);
       alert('数据保存成功！');
-      await loadData(); // 重新加载数据
+      await loadData();
     } catch (error) {
       console.error('保存数据失败:', error);
       alert('保存数据失败');
@@ -370,7 +524,7 @@ function App() {
       });
       
       alert('图片上传成功！');
-      await loadData(); // 重新加载数据
+      await loadData();
     } catch (error) {
       console.error('图片上传失败:', error);
       alert('图片上传失败');
@@ -399,10 +553,103 @@ function App() {
         });
         
         alert('图片删除成功！');
-        await loadData(); // 重新加载数据
+        await loadData();
       } catch (error) {
         console.error('删除图片失败:', error);
         alert('删除图片失败');
+      }
+    }
+  };
+
+  // 添加新板块
+  const handleAddSection = async () => {
+    if (!newSection.key || !newSection.label) {
+      alert('请输入板块标识和标签');
+      return;
+    }
+
+    try {
+      const maxOrder = Math.max(...Object.values(sectionConfigs).map(s => s.displayOrder || 0), 0);
+      
+      await supabase.createSectionConfig({
+        section_key: newSection.key,
+        label: newSection.label,
+        icon_name: newSection.icon,
+        display_order: maxOrder + 1
+      });
+
+      setShowNewSectionModal(false);
+      setNewSection({ key: '', label: '', icon: 'Package' });
+      alert('板块添加成功！');
+      await loadData();
+    } catch (error) {
+      console.error('添加板块失败:', error);
+      alert('添加板块失败');
+    }
+  };
+
+  // 删除板块
+  const handleDeleteSection = async (sectionKey) => {
+    if (window.confirm(`确认删除板块 "${sectionConfigs[sectionKey]?.label}" 吗？这将删除该板块的所有数据！`)) {
+      try {
+        await supabase.deleteSectionConfig(sectionKey);
+        alert('板块删除成功！');
+        await loadData();
+      } catch (error) {
+        console.error('删除板块失败:', error);
+        alert('删除板块失败');
+      }
+    }
+  };
+
+  // 为所有平台添加字段
+  const handleAddFieldToAllPlatforms = async (sectionKey, fieldKey, fieldLabel, fieldType = 'text') => {
+    try {
+      const maxOrder = fieldConfigs[sectionKey] 
+        ? Math.max(...Object.values(fieldConfigs[sectionKey]).map(f => f.displayOrder || 0), 0)
+        : 0;
+
+      await supabase.createFieldConfig({
+        section_key: sectionKey,
+        field_key: fieldKey,
+        label: fieldLabel,
+        field_type: fieldType,
+        display_order: maxOrder + 1
+      });
+
+      // 更新所有平台的数据
+      const promises = platforms.map(platform => {
+        const currentData = { ...platformData[sectionKey].data[platform.id] };
+        currentData[fieldKey] = fieldType === 'image' ? '' : '';
+        return supabase.upsertPlatformData(sectionKey, platform.id, currentData);
+      });
+
+      await Promise.all(promises);
+      await loadData();
+    } catch (error) {
+      console.error('添加字段失败:', error);
+      alert('添加字段失败');
+    }
+  };
+
+  // 从所有平台删除字段
+  const handleDeleteFieldFromAllPlatforms = async (sectionKey, fieldKey) => {
+    if (window.confirm(`确认删除字段 "${getFieldLabel(fieldKey)}" 吗？这将从所有平台中删除该字段！`)) {
+      try {
+        await supabase.deleteFieldConfig(sectionKey, fieldKey);
+
+        // 更新所有平台的数据
+        const promises = platforms.map(platform => {
+          const currentData = { ...platformData[sectionKey].data[platform.id] };
+          delete currentData[fieldKey];
+          return supabase.upsertPlatformData(sectionKey, platform.id, currentData);
+        });
+
+        await Promise.all(promises);
+        await loadData();
+      } catch (error) {
+        console.error('删除字段失败:', error);
+        alert('删除字段失败');
       }
     }
   };
@@ -421,292 +668,157 @@ function App() {
     </button>
   );
 
-  const renderSimpleData = (data, fields) => {
-    console.log('Rendering data:', data, fields); // 调试日志
+  const renderSimpleData = (data, sectionKey) => {
+    console.log('Rendering data:', data, sectionKey);
     if (!data) return <span className="text-gray-400">数据缺失</span>;
+    
+    const fields = fieldConfigs[sectionKey] || {};
+    const sortedFields = Object.entries(fields).sort((a, b) => (a[1].displayOrder || 0) - (b[1].displayOrder || 0));
+
     return (
       <div className="space-y-2 text-sm">
-        {fields.map(field => (
-          <div key={field.key}>
-            <span className="font-medium text-gray-700">{field.label}：</span>
-            <span className="text-gray-600">{data[field.key] || '数据缺失'}</span>
+        {sortedFields.map(([fieldKey, fieldConfig]) => (
+          <div key={fieldKey}>
+            <span className="font-medium text-gray-700">{fieldConfig.label}：</span>
+            <span className="text-gray-600">
+              {Array.isArray(data[fieldKey]) ? data[fieldKey].join('、') : (data[fieldKey] || '数据缺失')}
+            </span>
           </div>
         ))}
       </div>
     );
   };
 
-  const renderPaymentMethods = (paymentData) => {
-    if (!paymentData) return <span className="text-gray-400">数据缺失</span>;
-    return (
-      <div className="space-y-2 text-sm">
-        {paymentData.creditCard?.length > 0 && (
-          <div>
-            <span className="font-medium text-gray-700">信用卡/借记卡：</span>
-            <span className="text-gray-600">{paymentData.creditCard.join('、')}</span>
-          </div>
-        )}
-        {paymentData.eWallet?.length > 0 && (
-          <div>
-            <span className="font-medium text-gray-700">电子钱包：</span>
-            <span className="text-gray-600">{paymentData.eWallet.join('、')}</span>
-          </div>
-        )}
-        {paymentData.regional?.length > 0 && (
-          <div>
-            <span className="font-medium text-gray-700">地区特色：</span>
-            <span className="text-gray-600">{paymentData.regional.join('、')}</span>
-          </div>
-        )}
-        {paymentData.other?.length > 0 && (
-          <div>
-            <span className="font-medium text-gray-700">其他：</span>
-            <span className="text-gray-600">{paymentData.other.join('、')}</span>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  const renderSectionData = (key, data) => {
-    console.log('Rendering data for', key, data); // 调试日志
+  const renderSectionData = (sectionKey, data) => {
+    console.log('Rendering data for', sectionKey, data);
     if (!data) return <span className="text-gray-400">数据缺失</span>;
 
-    const fields = {
-      accountVerification: [
-        { key: 'method', label: '验证方式' },
-        { key: 'issues', label: '体验问题' },
-        { key: 'verificationInterface', label: '验证界面' },
-      ],
-      storage: [
-        { key: 'free', label: '免费保管期' },
-        { key: 'extended', label: '延长存储' },
-      ],
-      qc: [
-        { key: 'free', label: '免费QC' },
-        { key: 'extra', label: '额外QC价格' },
-        { key: 'quality', label: '照片质量' },
-      ],
-      shipping: [
-        { key: 'rehearsal', label: '预演包裹费' },
-        { key: 'seizure', label: '海关扣押险' },
-        { key: 'loss', label: '丢失/损坏险' },
-        { key: 'delay', label: '延迟险' },
-      ],
-      customerService: [
-        { key: 'hours', label: '工作时间' },
-        { key: 'days', label: '工作日' },
-        { key: 'response', label: '响应时间' },
-      ],
-      discord: [
-        { key: 'members', label: '社区人数' },
-        { key: 'activities', label: '活动频率' },
-        { key: 'rewards', label: '奖励形式' },
-        { key: 'referral', label: '拉新奖励' },
-        { key: 'dcLink', label: 'DC链接' },
-      ],
-      timing: [
-        { key: 'accept', label: '接单时间' },
-        { key: 'purchase', label: '采购时间' },
-        { key: 'shipping', label: '卖家发货' },
-        { key: 'arrival', label: '到仓时间' },
-        { key: 'qc', label: '质检上架' },
-      ],
-      coupon: [
-        { key: 'amount', label: '优惠金额' },
-        { key: 'type', label: '券码类型' },
-        { key: 'threshold', label: '使用门槛' },
-        { key: 'maxDiscount', label: '最高折扣' },
-        { key: 'stackable', label: '叠加使用' },
-      ],
-      commission: [
-        { key: 'base', label: '基础佣金' },
-        { key: 'max', label: '最高佣金' },
-        { key: 'mechanism', label: '计算机制' },
-      ],
-      membership: [
-        { key: 'points', label: '积分获取' },
-        { key: 'usage', label: '积分使用' },
-        { key: 'special', label: '特色功能' },
-      ],
-      transshipment: [
-        { key: 'address', label: '转运地址' },
-        { key: 'requirements', label: '信息要求' },
-      ],
-      app: [
-        { key: 'systems', label: '支持系统' },
-        { key: 'size', label: '安装包大小' },
-        { key: 'languages', label: '语言货币' },
-        { key: 'features', label: '特色功能' },
-      ],
-      customLogistics: [
-        { key: 'hasService', label: '是否有定制物流' },
-        { key: 'needInfo', label: '需要填写的信息' },
-        { key: 'tips', label: '提示信息' },
-        { key: 'feeDescription', label: '费用说明' },
-        { key: 'displayInterface', label: '展示界面' },
-      ],
-      afterSales: [
-        { key: 'returnFee', label: '商品退换货费用' },
-        { key: 'returnTime', label: '商品退换货官方时效' },
-        { key: 'processingTime', label: '包裹售后处理时间' },
-      ],
-    };
+    const fields = fieldConfigs[sectionKey] || {};
+    const sortedFields = Object.entries(fields).sort((a, b) => (a[1].displayOrder || 0) - (b[1].displayOrder || 0));
 
     return (
       <div className="space-y-3 text-sm">
-        {key === 'payment' ? (
-          renderPaymentMethods(data)
-        ) : key === 'language' ? (
-          <div className="space-y-3">
-            <div>
-              <span className="font-medium text-gray-700 block mb-1">支持语言：</span>
-              <span className="text-gray-600 text-xs">{data.languages}</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-700 block mb-1">支持货币：</span>
-              <span className="text-gray-600 text-xs">{data.currencies}</span>
-            </div>
-          </div>
-        ) : key === 'supportedPlatforms' ? (
-          <div className="text-sm">
-            <span className="font-medium text-gray-700">支持平台：</span>
-            <div className="mt-1 flex flex-wrap gap-1">
-              {(data.platforms || []).map(p => (
-                <span key={p} className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
-                  {p}
-                </span>
-              ))}
-            </div>
-          </div>
-        ) : key === 'valueAddedService' ? (
-          <div className="space-y-3">
-            <div>
-              <span className="font-medium text-gray-700 block mb-1">免费服务：</span>
-              <span className="text-gray-600 text-xs">{data.free || '无'}</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-700 block mb-1">收费服务：</span>
-              <span className="text-gray-600 text-xs">{data.paid}</span>
-            </div>
-            {data.shipping && data.shipping !== '无' && (
-              <div>
-                <span className="font-medium text-gray-700 block mb-1">运单增值：</span>
-                <span className="text-gray-600 text-xs">{data.shipping}</span>
+        {sortedFields.map(([fieldKey, fieldConfig]) => {
+          if (fieldConfig.type === 'image' && data[fieldKey]) {
+            return (
+              <div key={fieldKey} className="mt-3 relative">
+                <div className="font-medium text-gray-700 mb-2">{fieldConfig.label}：</div>
+                <img
+                  src={data[fieldKey]}
+                  alt={`${fieldConfig.label} Image`}
+                  className="h-40 w-40 object-contain rounded-lg border border-gray-200 shadow-md hover:scale-105 transition-transform cursor-pointer"
+                  loading="lazy"
+                  onClick={() => setPreviewImage(data[fieldKey])}
+                />
+                {isAdmin && (
+                  <button
+                    onClick={() => handleDeleteImage(sectionKey, data.platformId, fieldKey)}
+                    className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                    title="删除图片"
+                  >
+                    <Trash className="w-4 h-4" />
+                  </button>
+                )}
               </div>
-            )}
-          </div>
-        ) : (
-          renderSimpleData(data, fields[key] || [])
-        )}
-        {data.image && (
-          <div className="mt-3 relative">
-            <img
-              src={data.image}
-              alt={`${key} Image`}
-              className="h-40 w-40 object-contain rounded-lg border border-gray-200 shadow-md hover:scale-105 transition-transform cursor-pointer"
-              loading="lazy"
-              onClick={() => setPreviewImage(data.image)}
-            />
-            {isAdmin && (
-              <button
-                onClick={() => handleDeleteImage(key, data.platformId, 'image')}
-                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
-                title="删除图片"
-              >
-                <Trash className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-        )}
+            );
+          } else if (fieldConfig.type !== 'image') {
+            return (
+              <div key={fieldKey}>
+                <span className="font-medium text-gray-700">{fieldConfig.label}：</span>
+                <span className="text-gray-600">
+                  {Array.isArray(data[fieldKey]) ? data[fieldKey].join('、') : (data[fieldKey] || '数据缺失')}
+                </span>
+              </div>
+            );
+          }
+          return null;
+        })}
       </div>
     );
   };
 
   const EditForm = ({ sectionKey, platformId, onClose, onSave }) => {
     const [formData, setFormData] = useState(() => ({ ...platformData[sectionKey].data[platformId] }));
-    const [customFields, setCustomFields] = useState(Object.keys(platformData[sectionKey].data[platformId]).map(key => ({ key, label: key.charAt(0).toUpperCase() + key.slice(1), type: key === 'image' ? 'image' : 'text' })));
+    const [newFieldKey, setNewFieldKey] = useState('');
+    const [newFieldLabel, setNewFieldLabel] = useState('');
+    const [newFieldType, setNewFieldType] = useState('text');
 
-    useEffect(() => {
-      // 同步 formData 与 customFields
-      setFormData(prev => {
-        const newData = {};
-        customFields.forEach(field => {
-          newData[field.key] = prev[field.key] || '';
-        });
-        return newData;
-      });
-    }, [customFields]);
+    const currentFields = fieldConfigs[sectionKey] || {};
+    const sortedFields = Object.entries(currentFields).sort((a, b) => (a[1].displayOrder || 0) - (b[1].displayOrder || 0));
 
     const handleChange = (key, value) => {
       setFormData(prev => ({ ...prev, [key]: value }));
     };
 
-    const handleAddField = () => {
-      const newFieldName = prompt('请输入新类目名称：');
-      if (newFieldName) {
-        const fieldType = prompt('请选择类目类型（text/image）：', 'text');
-        if (fieldType === 'text' || fieldType === 'image') {
-          setCustomFields(prev => [...prev, { key: newFieldName.toLowerCase(), label: newFieldName, type: fieldType }]);
-          handleChange(newFieldName.toLowerCase(), fieldType === 'image' ? '' : '');
-        } else {
-          alert('无效类型！请选择 "text" 或 "image"。');
-        }
+    const handleAddField = async () => {
+      if (!newFieldKey || !newFieldLabel) {
+        alert('请输入字段标识和标签');
+        return;
+      }
+      
+      if (currentFields[newFieldKey]) {
+        alert('该字段已存在！');
+        return;
+      }
+
+      try {
+        await handleAddFieldToAllPlatforms(sectionKey, newFieldKey, newFieldLabel, newFieldType);
+        setNewFieldKey('');
+        setNewFieldLabel('');
+        setNewFieldType('text');
+        alert('字段添加成功！已同步到所有平台');
+      } catch (error) {
+        console.error('添加字段失败:', error);
+        alert('添加字段失败');
       }
     };
 
-    const handleDeleteField = (keyToDelete) => {
-      if (window.confirm(`确认删除类目 "${keyToDelete}" 吗？`)) {
-        setCustomFields(prev => prev.filter(field => field.key !== keyToDelete));
-        setFormData(prev => {
-          const newData = { ...prev };
-          delete newData[keyToDelete];
-          return newData;
-        });
-      }
+    const handleDeleteField = async (fieldKey) => {
+      await handleDeleteFieldFromAllPlatforms(sectionKey, fieldKey);
     };
 
     const handleSave = async () => {
       const cleanedData = {};
-      customFields.forEach(field => {
-        cleanedData[field.key] = formData[field.key] || '';
+      Object.keys(currentFields).forEach(fieldKey => {
+        cleanedData[fieldKey] = formData[fieldKey] || '';
       });
-      console.log('Saving data:', cleanedData); // 调试日志
+      console.log('Saving data:', cleanedData);
       await onSave(cleanedData);
     };
 
     return (
       <div className="space-y-4">
-        {customFields.map(field => (
-          <div key={field.key} className="flex flex-col">
+        {sortedFields.map(([fieldKey, fieldConfig]) => (
+          <div key={fieldKey} className="flex flex-col">
             <div className="flex items-center justify-between">
-              <label className="block text-sm font-medium text-gray-700">{field.label}：</label>
+              <label className="block text-sm font-medium text-gray-700">{fieldConfig.label}：</label>
               {isAdmin && (
                 <button
-                  onClick={() => handleDeleteField(field.key)}
+                  onClick={() => handleDeleteField(fieldKey)}
                   className="p-1 text-red-500 hover:text-red-700"
+                  title="从所有平台删除此字段"
                 >
                   <Trash className="w-4 h-4" />
                 </button>
               )}
             </div>
-            {field.type === 'image' ? (
+            {fieldConfig.type === 'image' ? (
               <div className="space-y-2">
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={e => handleImageUpload(e, sectionKey, platformId, field.key)}
+                  onChange={e => handleImageUpload(e, sectionKey, platformId, fieldKey)}
                   className="mt-1"
                 />
-                {formData[field.key] && (
+                {formData[fieldKey] && (
                   <div className="relative">
                     <img
-                      src={formData[field.key]}
+                      src={formData[fieldKey]}
                       alt="Preview"
                       className="h-40 w-40 object-contain rounded-lg border border-gray-200 shadow-md"
                     />
                     <button
-                      onClick={() => handleDeleteImage(sectionKey, platformId, field.key)}
+                      onClick={() => handleDeleteImage(sectionKey, platformId, fieldKey)}
                       className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
                       title="删除图片"
                     >
@@ -715,32 +827,61 @@ function App() {
                   </div>
                 )}
               </div>
-            ) : field.key === 'creditCard' || field.key === 'eWallet' || field.key === 'regional' || field.key === 'other' || field.key === 'platforms' || field.key === 'systems' ? (
+            ) : fieldKey === 'creditCard' || fieldKey === 'eWallet' || fieldKey === 'regional' || fieldKey === 'other' || fieldKey === 'platforms' || fieldKey === 'systems' ? (
               <textarea
-                value={Array.isArray(formData[field.key]) ? formData[field.key].join('、') : formData[field.key] || ''}
-                onChange={e => handleChange(field.key, e.target.value.split('、').filter(item => item.trim()))}
+                value={Array.isArray(formData[fieldKey]) ? formData[fieldKey].join('、') : formData[fieldKey] || ''}
+                onChange={e => handleChange(fieldKey, e.target.value.split('、').filter(item => item.trim()))}
                 placeholder="多个项目用 、 分隔"
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 rows="2"
               />
             ) : (
               <textarea
-                value={formData[field.key] || ''}
-                onChange={e => handleChange(field.key, e.target.value)}
+                value={formData[fieldKey] || ''}
+                onChange={e => handleChange(fieldKey, e.target.value)}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 rows="3"
               />
             )}
           </div>
         ))}
+        
         {isAdmin && (
-          <button
-            onClick={handleAddField}
-            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-          >
-            <Plus className="w-4 h-4 inline mr-1" /> 添加类目
-          </button>
+          <div className="border-t pt-4">
+            <h4 className="text-sm font-medium text-gray-900 mb-3">添加新字段（同步到所有平台）</h4>
+            <div className="grid grid-cols-1 gap-3">
+              <input
+                type="text"
+                value={newFieldKey}
+                onChange={e => setNewFieldKey(e.target.value)}
+                placeholder="字段标识（英文，如：newField）"
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+              <input
+                type="text"
+                value={newFieldLabel}
+                onChange={e => setNewFieldLabel(e.target.value)}
+                placeholder="字段标签（中文，如：新字段）"
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+              <select
+                value={newFieldType}
+                onChange={e => setNewFieldType(e.target.value)}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option value="text">文本</option>
+                <option value="image">图片</option>
+              </select>
+              <button
+                onClick={handleAddField}
+                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+              >
+                <Plus className="w-4 h-4 inline mr-1" /> 添加字段到所有平台
+              </button>
+            </div>
+          </div>
         )}
+
         <div className="flex space-x-2">
           <button
             onClick={handleSave}
@@ -794,7 +935,7 @@ function App() {
             代购平台详细对比系统
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            云端同步 · 实时更新 · 多人协作
+            专业的代购平台对比分析工具
           </p>
           <div className="mt-2 text-sm text-green-600 flex items-center justify-center">
             <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
@@ -841,6 +982,55 @@ function App() {
           </div>
         )}
 
+        {showNewSectionModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <h3 className="text-lg font-bold mb-4">添加新板块</h3>
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  value={newSection.key}
+                  onChange={e => setNewSection({ ...newSection, key: e.target.value })}
+                  placeholder="板块标识（英文，如：newSection）"
+                  className="w-full p-2 border rounded-md"
+                />
+                <input
+                  type="text"
+                  value={newSection.label}
+                  onChange={e => setNewSection({ ...newSection, label: e.target.value })}
+                  placeholder="板块标签（中文，如：新板块）"
+                  className="w-full p-2 border rounded-md"
+                />
+                <select
+                  value={newSection.icon}
+                  onChange={e => setNewSection({ ...newSection, icon: e.target.value })}
+                  className="w-full p-2 border rounded-md"
+                >
+                  {iconOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex space-x-2 mt-4">
+                <button
+                  onClick={handleAddSection}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                >
+                  添加
+                </button>
+                <button
+                  onClick={() => setShowNewSectionModal(false)}
+                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                >
+                  取消
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex justify-center space-x-4 mb-8 flex-wrap gap-4">
           <TabButton id="comparison" label="平台对比" icon={ArrowUpDown} />
           <TabButton id="quick-view" label="快速查看" icon={Eye} />
@@ -865,6 +1055,14 @@ function App() {
               >
                 清空
               </button>
+              {isAdmin && (
+                <button
+                  onClick={() => setShowNewSectionModal(true)}
+                  className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm"
+                >
+                  <Plus className="w-4 h-4 inline mr-1" /> 新增板块
+                </button>
+              )}
             </div>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -939,9 +1137,14 @@ function App() {
 
         {activeTab === 'comparison' && (
           <div className="space-y-6">
-            {Object.entries(platformData).map(([key, section]) => {
+            {Object.entries(sectionConfigs)
+              .sort((a, b) => (a[1].displayOrder || 0) - (b[1].displayOrder || 0))
+              .map(([key, section]) => {
               const Icon = section.icon;
               const isExpanded = expandedSections[key] !== false;
+              const sectionData = platformData[key];
+
+              if (!sectionData) return null;
 
               return (
                 <div key={key} className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 overflow-hidden">
@@ -953,11 +1156,25 @@ function App() {
                       <Icon className="w-6 h-6 text-white mr-3" />
                       <h2 className="text-xl font-bold text-white">{section.label}</h2>
                     </div>
-                    {isExpanded ? (
-                      <ChevronUp className="w-5 h-5 text-white" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5 text-white" />
-                    )}
+                    <div className="flex items-center space-x-2">
+                      {isAdmin && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteSection(key);
+                          }}
+                          className="p-1 text-white hover:text-red-300"
+                          title="删除板块"
+                        >
+                          <Trash className="w-5 h-5" />
+                        </button>
+                      )}
+                      {isExpanded ? (
+                        <ChevronUp className="w-5 h-5 text-white" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5 text-white" />
+                      )}
+                    </div>
                   </button>
 
                   {isExpanded && (
@@ -969,7 +1186,7 @@ function App() {
                           {platforms
                             .filter(p => selectedPlatforms.includes(p.id))
                             .map(platform => {
-                              const data = { ...section.data[platform.id], platformId: platform.id };
+                              const data = { ...sectionData.data[platform.id], platformId: platform.id };
                               const hasAdvantage = isAdvantage(key, platform.id);
 
                               return (
@@ -1075,126 +1292,30 @@ function App() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="border-b border-gray-200 bg-gray-50">
-                      <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-gray-50">
-                        验证方式
-                      </td>
-                      {platforms
-                        .filter(p => selectedPlatforms.includes(p.id))
-                        .map(platform => (
-                          <td key={platform.id} className="px-6 py-3 text-center text-sm">
-                            {platformData.accountVerification?.data[platform.id]?.method || '-'}
-                          </td>
-                        ))}
-                    </tr>
-                    <tr className="border-b border-gray-200">
-                      <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-white">
-                        免费保管期
-                      </td>
-                      {platforms
-                        .filter(p => selectedPlatforms.includes(p.id))
-                        .map(platform => (
-                          <td key={platform.id} className="px-6 py-3 text-center text-sm">
-                            {platformData.storage?.data[platform.id]?.free || '-'}
-                          </td>
-                        ))}
-                    </tr>
-                    <tr className="border-b border-gray-200 bg-gray-50">
-                      <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-gray-50">
-                        免费QC张数
-                      </td>
-                      {platforms
-                        .filter(p => selectedPlatforms.includes(p.id))
-                        .map(platform => (
-                          <td key={platform.id} className="px-6 py-3 text-center text-sm">
-                            {platformData.qc?.data[platform.id]?.free || '-'}
-                          </td>
-                        ))}
-                    </tr>
-                    <tr className="border-b border-gray-200">
-                      <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-white">
-                        额外QC价格
-                      </td>
-                      {platforms
-                        .filter(p => selectedPlatforms.includes(p.id))
-                        .map(platform => (
-                          <td key={platform.id} className="px-6 py-3 text-center text-sm">
-                            {platformData.qc?.data[platform.id]?.extra || '-'}
-                          </td>
-                        ))}
-                    </tr>
-                    <tr className="border-b border-gray-200 bg-gray-50">
-                      <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-gray-50">
-                        预演包裹费
-                      </td>
-                      {platforms
-                        .filter(p => selectedPlatforms.includes(p.id))
-                        .map(platform => (
-                          <td key={platform.id} className="px-6 py-3 text-center text-sm">
-                            {platformData.shipping?.data[platform.id]?.rehearsal || '-'}
-                          </td>
-                        ))}
-                    </tr>
-                    <tr className="border-b border-gray-200">
-                      <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-white">
-                        客服时间
-                      </td>
-                      {platforms
-                        .filter(p => selectedPlatforms.includes(p.id))
-                        .map(platform => (
-                          <td key={platform.id} className="px-6 py-3 text-center text-sm">
-                            {platformData.customerService?.data[platform.id]?.hours || '-'}
-                          </td>
-                        ))}
-                    </tr>
-                    <tr className="border-b border-gray-200 bg-gray-50">
-                      <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-gray-50">
-                        Discord人数
-                      </td>
-                      {platforms
-                        .filter(p => selectedPlatforms.includes(p.id))
-                        .map(platform => (
-                          <td key={platform.id} className="px-6 py-3 text-center text-sm">
-                            {platformData.discord?.data[platform.id]?.members || '-'}
-                          </td>
-                        ))}
-                    </tr>
-                    <tr className="border-b border-gray-200">
-                      <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-white">
-                        优惠金额
-                      </td>
-                      {platforms
-                        .filter(p => selectedPlatforms.includes(p.id))
-                        .map(platform => (
-                          <td key={platform.id} className="px-6 py-3 text-center text-sm">
-                            {platformData.coupon?.data[platform.id]?.amount || '-'}
-                          </td>
-                        ))}
-                    </tr>
-                    <tr className="border-b border-gray-200 bg-gray-50">
-                      <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-gray-50">
-                        支持语言数
-                      </td>
-                      {platforms
-                        .filter(p => selectedPlatforms.includes(p.id))
-                        .map(platform => (
-                          <td key={platform.id} className="px-6 py-3 text-center text-sm">
-                            {platformData.language?.data[platform.id]?.languages?.split('：')[0] || '-'}
-                          </td>
-                        ))}
-                    </tr>
-                    <tr className="border-b border-gray-200">
-                      <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-white">
-                        支持货币数
-                      </td>
-                      {platforms
-                        .filter(p => selectedPlatforms.includes(p.id))
-                        .map(platform => (
-                          <td key={platform.id} className="px-6 py-3 text-center text-sm">
-                            {platformData.language?.data[platform.id]?.currencies?.split('：')[0] || '-'}
-                          </td>
-                        ))}
-                    </tr>
+                    {Object.entries(sectionConfigs)
+                      .sort((a, b) => (a[1].displayOrder || 0) - (b[1].displayOrder || 0))
+                      .map(([sectionKey, section], sectionIndex) => {
+                        const fields = fieldConfigs[sectionKey] || {};
+                        const sortedFields = Object.entries(fields)
+                          .filter(([fieldKey, fieldConfig]) => fieldConfig.type !== 'image')
+                          .sort((a, b) => (a[1].displayOrder || 0) - (b[1].displayOrder || 0))
+                          .slice(0, 3); // 只显示前3个字段
+
+                        return sortedFields.map(([fieldKey, fieldConfig], fieldIndex) => (
+                          <tr key={`${sectionKey}-${fieldKey}`} className={`border-b border-gray-200 ${(sectionIndex * 3 + fieldIndex) % 2 === 0 ? 'bg-gray-50' : ''}`}>
+                            <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-gray-50">
+                              {fieldConfig.label}
+                            </td>
+                            {platforms
+                              .filter(p => selectedPlatforms.includes(p.id))
+                              .map(platform => (
+                                <td key={platform.id} className="px-6 py-3 text-center text-sm">
+                                  {platformData[sectionKey]?.data[platform.id]?.[fieldKey] || '-'}
+                                </td>
+                              ))}
+                          </tr>
+                        ));
+                      })}
                   </tbody>
                 </table>
               </div>
