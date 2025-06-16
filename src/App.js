@@ -290,13 +290,17 @@ function App() {
       
       // 加载平台数据
       const platformsData = await supabase.getPlatforms();
-      setPlatforms(platformsData || []);
-      setSelectedPlatforms((platformsData || []).map(p => p.id));
+      if (!platformsData || platformsData.length === 0) {
+        console.error('No platforms data loaded from Supabase');
+        throw new Error('平台数据加载失败');
+      }
+      setPlatforms(platformsData);
+      setSelectedPlatforms(platformsData.map(p => p.id));
 
       // 加载板块配置
       const sectionsData = await supabase.getSectionConfigs();
       const sectionsConfig = {};
-      if (sectionsData) {
+      if (sectionsData && sectionsData.length > 0) {
         sectionsData.forEach(section => {
           sectionsConfig[section.section_key] = {
             label: section.label,
@@ -304,13 +308,15 @@ function App() {
             displayOrder: section.display_order
           };
         });
+      } else {
+        console.error('No section configs loaded from Supabase');
       }
       setSectionConfigs(sectionsConfig);
 
       // 加载字段配置
       const fieldsData = await supabase.getFieldConfigs();
       const fieldsConfig = {};
-      if (fieldsData) {
+      if (fieldsData && fieldsData.length > 0) {
         fieldsData.forEach(field => {
           if (!fieldsConfig[field.section_key]) {
             fieldsConfig[field.section_key] = {};
@@ -321,6 +327,8 @@ function App() {
             displayOrder: field.display_order
           };
         });
+      } else {
+        console.error('No field configs loaded from Supabase');
       }
       setFieldConfigs(fieldsConfig);
 
@@ -334,7 +342,7 @@ function App() {
           icon: sectionsConfig[sectionKey].icon,
           data: {}
         };
-        (platformsData || []).forEach(platform => {
+        platformsData.forEach(platform => {
           formattedData[sectionKey].data[platform.id] = {};
           if (fieldsConfig[sectionKey]) {
             Object.keys(fieldsConfig[sectionKey]).forEach(fieldKey => {
@@ -344,12 +352,14 @@ function App() {
         });
       });
 
-      if (platformDataRows) {
+      if (platformDataRows && platformDataRows.length > 0) {
         platformDataRows.forEach(row => {
           if (formattedData[row.section_key]) {
             formattedData[row.section_key].data[row.platform_id] = { ...row.data };
           }
         });
+      } else {
+        console.warn('No platform data rows loaded, using empty data structure');
       }
       console.log('Loaded platformData:', formattedData);
       setPlatformData(formattedData);
@@ -357,7 +367,7 @@ function App() {
       // 加载优势标记
       const advantageData = await supabase.getAdvantagePlatforms();
       const formattedAdvantage = {};
-      if (advantageData) {
+      if (advantageData && advantageData.length > 0) {
         advantageData.forEach(row => {
           formattedAdvantage[row.section_key] = row.platform_ids || [];
         });
@@ -365,7 +375,7 @@ function App() {
       setAdvantagePlatforms(formattedAdvantage);
     } catch (error) {
       console.error('加载数据失败:', error);
-      showToast('数据加载失败，请检查网络连接');
+      showToast('数据加载失败，请检查网络或 Supabase 配置');
     } finally {
       setLoading(false);
     }
@@ -1412,7 +1422,7 @@ function App() {
                       });
                       setSelectedFields(prev => ({ ...prev, ...newSelectedFields }));
                     }}
-                    className="w-full p-2 border rounded-md bg-white focus:border-blue-500 focus:ring-blue-500"
+                    className="w-full p-2 border rounded-xl bg-white focus:border-blue-500 focus:ring-blue-500"
                   >
                     {Object.keys(sectionConfigs).map(key => (
                       <option key={key} value={key}>
@@ -1430,7 +1440,7 @@ function App() {
                       <select
                         value={selectedFields[sectionKey] || ''}
                         onChange={(e) => setSelectedFields(prev => ({ ...prev, [sectionKey]: e.target.value }))}
-                        className="w-full p-2 border rounded-md bg-white focus:border-blue-500 focus:ring-blue-500"
+                        className="w-full p-2 border rounded-xl bg-white focus:border-blue-500 focus:ring-blue-500"
                       >
                         {(fieldConfigs[sectionKey] ? Object.entries(fieldConfigs[sectionKey]).sort((a, b) => (a[1].displayOrder || 0) - (b[1].displayOrder || 0)) : []).map(([fieldKey]) => (
                           <option key={fieldKey} value={fieldKey}>
@@ -1474,9 +1484,9 @@ function App() {
                       </tr>
                     </thead>
                     <tbody>
-                      {selectedSections.map(sectionKey => (
-                        <tr key={sectionKey} className="border-b border-gray-200">
-                          <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-white">
+                      {selectedSections.map((sectionKey, index) => (
+                        <tr key={sectionKey} className={`border-b border-gray-200 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
+                          <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-white rounded-bl-xl">
                             {sectionConfigs[sectionKey]?.label} - {fieldConfigs[sectionKey]?.[selectedFields[sectionKey]]?.label || '请选择类目'}
                           </td>
                           {platforms
@@ -1486,11 +1496,12 @@ function App() {
                               const value = data[selectedFields[sectionKey]] || '数据缺失';
 
                               return (
-                                <td key={platform.id} className="px-6 py-3 text-center text-sm bg-gray-50">
+                                <td key={platform.id} className="px-6 py-3 text-center text-sm">
                                   {Array.isArray(value) ? value.join('、') : value}
                                 </td>
                               );
                             })}
+                          <td className="px-6 py-3 text-center rounded-br-xl"></td>
                         </tr>
                       ))}
                     </tbody>
