@@ -180,6 +180,7 @@ function App() {
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [selectedSections, setSelectedSections] = useState([]);
+  const [selectedFields, setSelectedFields] = useState({});
 
   // 显示成功提示
   const showToast = (message) => {
@@ -781,17 +782,18 @@ function App() {
     
     const fields = fieldConfigs[sectionKey] || {};
     const sortedFields = Object.entries(fields).sort((a, b) => (a[1].displayOrder || 0) - (b[1].displayOrder || 0));
+    const selectedField = selectedFields[sectionKey] || sortedFields[0]?.[0];
 
     return (
       <div className="space-y-2 text-sm">
-        {sortedFields.map(([fieldKey, fieldConfig]) => (
-          <div key={fieldKey}>
-            <span className="font-medium text-gray-700">{fieldConfig.label}：</span>
+        {selectedField && (
+          <div>
+            <span className="font-medium text-gray-700">{fields[selectedField].label}：</span>
             <span className="text-gray-600">
-              {Array.isArray(data[fieldKey]) ? data[fieldKey].join('、') : (data[fieldKey] || '数据缺失')}
+              {Array.isArray(data[selectedField]) ? data[selectedField].join('、') : (data[selectedField] || '数据缺失')}
             </span>
           </div>
-        ))}
+        )}
       </div>
     );
   };
@@ -801,44 +803,38 @@ function App() {
 
     const fields = fieldConfigs[sectionKey] || {};
     const sortedFields = Object.entries(fields).sort((a, b) => (a[1].displayOrder || 0) - (b[1].displayOrder || 0));
+    const selectedField = selectedFields[sectionKey] || sortedFields[0]?.[0];
 
     return (
       <div className="space-y-3 text-sm">
-        {sortedFields.map(([fieldKey, fieldConfig]) => {
-          if (fieldConfig.type === 'image' && data[fieldKey]) {
-            return (
-              <div key={fieldKey} className="mt-3 relative">
-                <div className="font-medium text-gray-700 mb-2">{fieldConfig.label}：</div>
-                <img
-                  src={data[fieldKey]}
-                  alt={`${fieldConfig.label} Image`}
-                  className="h-40 w-40 object-contain rounded-lg border border-gray-200 shadow-md hover:scale-105 transition-transform cursor-pointer"
-                  loading="lazy"
-                  onClick={() => setPreviewImage(data[fieldKey])}
-                />
-                {isAdmin && (
-                  <button
-                    onClick={() => handleDeleteImage(sectionKey, data.platformId, fieldKey)}
-                    className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
-                    title="删除图片"
-                  >
-                    <Trash className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-            );
-          } else if (fieldConfig.type !== 'image') {
-            return (
-              <div key={fieldKey}>
-                <span className="font-medium text-gray-700">{fieldConfig.label}：</span>
-                <span className="text-gray-600">
-                  {Array.isArray(data[fieldKey]) ? data[fieldKey].join('、') : (data[fieldKey] || '数据缺失')}
-                </span>
-              </div>
-            );
-          }
-          return null;
-        })}
+        {selectedField && fields[selectedField].type !== 'image' && (
+          <div>
+            <span className="font-medium text-gray-700">{fields[selectedField].label}：</span>
+            <span className="text-gray-600">
+              {Array.isArray(data[selectedField]) ? data[selectedField].join('、') : (data[selectedField] || '数据缺失')}
+            </span>
+          </div>
+        )}
+        {selectedField && fields[selectedField].type === 'image' && data[selectedField] && (
+          <div className="mt-3 relative">
+            <img
+              src={data[selectedField]}
+              alt={`${fields[selectedField].label} Image`}
+              className="h-40 w-40 object-contain rounded-lg border border-gray-200 shadow-md hover:scale-105 transition-transform cursor-pointer"
+              loading="lazy"
+              onClick={() => setPreviewImage(data[selectedField])}
+            />
+            {isAdmin && (
+              <button
+                onClick={() => handleDeleteImage(sectionKey, data.platformId, selectedField)}
+                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                title="删除图片"
+              >
+                <Trash className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        )}
       </div>
     );
   };
@@ -1400,24 +1396,6 @@ function App() {
             <div className="p-6">
               <div className="flex flex-col sm:flex-row justify-between mb-6 gap-4">
                 <div className="w-full sm:w-1/2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">选择平台</label>
-                  <select
-                    multiple
-                    value={selectedPlatforms}
-                    onChange={(e) => {
-                      const options = Array.from(e.target.selectedOptions, option => Number(option.value));
-                      setSelectedPlatforms(options);
-                    }}
-                    className="w-full p-2 border rounded-md bg-white focus:border-blue-500 focus:ring-blue-500"
-                  >
-                    {platforms.map(platform => (
-                      <option key={platform.id} value={platform.id}>
-                        {platform.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="w-full sm:w-1/2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">选择板块</label>
                   <select
                     multiple
@@ -1425,6 +1403,14 @@ function App() {
                     onChange={(e) => {
                       const options = Array.from(e.target.selectedOptions, option => option.value);
                       setSelectedSections(options);
+                      // 初始化选定字段为每个板块的第一个字段
+                      const newSelectedFields = {};
+                      options.forEach(section => {
+                        const fields = fieldConfigs[section] || {};
+                        const sortedFields = Object.entries(fields).sort((a, b) => (a[1].displayOrder || 0) - (b[1].displayOrder || 0));
+                        newSelectedFields[section] = sortedFields[0]?.[0] || '';
+                      });
+                      setSelectedFields(prev => ({ ...prev, ...newSelectedFields }));
                     }}
                     className="w-full p-2 border rounded-md bg-white focus:border-blue-500 focus:ring-blue-500"
                   >
@@ -1435,16 +1421,36 @@ function App() {
                     ))}
                   </select>
                 </div>
+                <div className="w-full sm:w-1/2 space-y-4">
+                  {selectedSections.map(sectionKey => (
+                    <div key={sectionKey}>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {sectionConfigs[sectionKey]?.label} 的类目
+                      </label>
+                      <select
+                        value={selectedFields[sectionKey] || ''}
+                        onChange={(e) => setSelectedFields(prev => ({ ...prev, [sectionKey]: e.target.value }))}
+                        className="w-full p-2 border rounded-md bg-white focus:border-blue-500 focus:ring-blue-500"
+                      >
+                        {(fieldConfigs[sectionKey] ? Object.entries(fieldConfigs[sectionKey]).sort((a, b) => (a[1].displayOrder || 0) - (b[1].displayOrder || 0)) : []).map(([fieldKey]) => (
+                          <option key={fieldKey} value={fieldKey}>
+                            {fieldConfigs[sectionKey][fieldKey].label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {selectedPlatforms.length === 0 || selectedSections.length === 0 ? (
                 <p className="text-center text-gray-500">请至少选择一个平台和一个板块进行对比</p>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full">
+                  <table className="w-full rounded-xl">
                     <thead>
                       <tr className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-                        <th className="px-6 py-4 text-left font-semibold sticky left-0 z-10 bg-gradient-to-r from-blue-500 to-purple-600">
+                        <th className="px-6 py-4 text-left font-semibold sticky left-0 z-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-tl-xl">
                           对比项目
                         </th>
                         {platforms
@@ -1464,94 +1470,29 @@ function App() {
                               </div>
                             </th>
                           ))}
+                        <th className="px-6 py-4 text-center font-semibold bg-gradient-to-r from-blue-500 to-purple-600 rounded-tr-xl"></th>
                       </tr>
                     </thead>
                     <tbody>
-                      {selectedSections.map(sectionKey => {
-                        const section = sectionConfigs[sectionKey];
-                        const fields = fieldConfigs[sectionKey] || {};
-                        const keyField = Object.keys(fields)[0]; // 使用第一个字段作为代表性数据
+                      {selectedSections.map(sectionKey => (
+                        <tr key={sectionKey} className="border-b border-gray-200">
+                          <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-white">
+                            {sectionConfigs[sectionKey]?.label} - {fieldConfigs[sectionKey]?.[selectedFields[sectionKey]]?.label || '请选择类目'}
+                          </td>
+                          {platforms
+                            .filter(p => selectedPlatforms.includes(p.id))
+                            .map(platform => {
+                              const data = platformData[sectionKey]?.data[platform.id] || {};
+                              const value = data[selectedFields[sectionKey]] || '数据缺失';
 
-                        return (
-                          <tr key={sectionKey} className="border-b border-gray-200">
-                            <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-white">
-                              {section.label}
-                            </td>
-                            {platforms
-                              .filter(p => selectedPlatforms.includes(p.id))
-                              .map(platform => {
-                                const data = platformData[sectionKey]?.data[platform.id] || {};
-                                let value = '否';
-
-                                // 自定义“是/否”逻辑
-                                switch (sectionKey) {
-                                  case 'accountVerification':
-                                    value = data.method === '邮箱点击验证' ? '是' : '否';
-                                    break;
-                                  case 'payment':
-                                    value = (data.creditCard?.length || 0) + (data.eWallet?.length || 0) + (data.regional?.length || 0) + (data.other?.length || 0) >= 3 ? '是' : '否';
-                                    break;
-                                  case 'storage':
-                                    value = data.free && data.free !== '数据缺失' ? '是' : '否';
-                                    break;
-                                  case 'qc':
-                                    value = data.free && data.free !== '数据缺失' ? '是' : '否';
-                                    break;
-                                  case 'shipping':
-                                    value = data.seizure && data.seizure !== '无' ? '是' : '否';
-                                    break;
-                                  case 'customerService':
-                                    value = data.hours && data.hours.includes('24') ? '是' : '否';
-                                    break;
-                                  case 'discord':
-                                    value = parseInt(data.members?.replace(/,/g, '')) > 10000 ? '是' : '否';
-                                    break;
-                                  case 'timing':
-                                    value = data.arrival && parseInt(data.arrival) <= 3 ? '是' : '否';
-                                    break;
-                                  case 'coupon':
-                                    value = data.amount && data.amount !== '数据缺失' ? '是' : '否';
-                                    break;
-                                  case 'language':
-                                    value = (data.languages?.split('：')[0]?.match(/\d+/) || [0])[0] >= 5 ? '是' : '否';
-                                    break;
-                                  case 'commission':
-                                    value = data.base && data.base !== '数据缺失' ? '是' : '否';
-                                    break;
-                                  case 'membership':
-                                    value = data.points && data.points !== '无会员体系' ? '是' : '否';
-                                    break;
-                                  case 'transshipment':
-                                    value = data.address && data.address !== '无' ? '是' : '否';
-                                    break;
-                                  case 'supportedPlatforms':
-                                    value = data.platforms?.includes('淘宝') || data.platforms?.includes('天猫国际') ? '是' : '否';
-                                    break;
-                                  case 'app':
-                                    value = data.systems && data.systems !== '无APP' ? '是' : '否';
-                                    break;
-                                  case 'valueAddedService':
-                                    value = data.paid && data.paid !== '无' ? '是' : '否';
-                                    break;
-                                  case 'customLogistics':
-                                    value = data.hasService === '√' ? '是' : '否';
-                                    break;
-                                  case 'afterSales':
-                                    value = data.returnTime && data.returnTime !== '数据缺失' ? '是' : '否';
-                                    break;
-                                  default:
-                                    value = data[keyField] ? '是' : '否';
-                                }
-
-                                return (
-                                  <td key={platform.id} className="px-6 py-3 text-center text-sm">
-                                    {value}
-                                  </td>
-                                );
-                              })}
-                          </tr>
-                        );
-                      })}
+                              return (
+                                <td key={platform.id} className="px-6 py-3 text-center text-sm bg-gray-50">
+                                  {Array.isArray(value) ? value.join('、') : value}
+                                </td>
+                              );
+                            })}
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
