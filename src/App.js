@@ -563,16 +563,48 @@ function App() {
 
   // 添加新板块
   const handleAddSection = async () => {
-    if (!newSection.key || !newSection.label) {
-      alert('请输入板块标识和标签');
+    if (!newSection.label) {
+      alert('请输入板块名称');
       return;
     }
+
+    // 生成板块标识
+    const generateSectionKey = (label) => {
+      const pinyinMap = {
+        '账户': 'account', '验证': 'verification', '方式': 'method', '支付': 'payment',
+        '保管': 'storage', '期': 'period', '质检': 'qc', '运费': 'shipping',
+        '保险': 'insurance', '客服': 'customer', '支持': 'service', '社区': 'community',
+        '时效': 'timing', '优惠券': 'coupon', '语言': 'language', '货币': 'currency',
+        '联盟': 'alliance', '佣金': 'commission', '会员': 'membership', '体系': 'system',
+        '转运': 'forwarding', '服务': 'service', '支持': 'supported', '链接': 'link',
+        '平台': 'platforms', '体验': 'experience', '增值': 'valueAdded',
+        '定制': 'custom', '物流': 'logistics', '售后': 'afterSales'
+      };
+      
+      let result = label;
+      Object.keys(pinyinMap).forEach(cn => {
+        result = result.replace(new RegExp(cn, 'g'), pinyinMap[cn]);
+      });
+      
+      if (/[\u4e00-\u9fa5]/.test(result)) {
+        result = `section_${Date.now()}`;
+      }
+      
+      result = result.toLowerCase()
+        .replace(/[^a-z0-9]/g, '_')
+        .replace(/_+/g, '_')
+        .replace(/^_|_$/g, '');
+      
+      return result;
+    };
+
+    const sectionKey = generateSectionKey(newSection.label);
 
     try {
       const maxOrder = Math.max(...Object.values(sectionConfigs).map(s => s.displayOrder || 0), 0);
       
       await supabase.createSectionConfig({
-        section_key: newSection.key,
+        section_key: sectionKey,
         label: newSection.label,
         icon_name: newSection.icon,
         display_order: maxOrder + 1
@@ -739,7 +771,6 @@ function App() {
 
   const EditForm = ({ sectionKey, platformId, onClose, onSave }) => {
     const [formData, setFormData] = useState(() => ({ ...platformData[sectionKey].data[platformId] }));
-    const [newFieldKey, setNewFieldKey] = useState('');
     const [newFieldLabel, setNewFieldLabel] = useState('');
     const [newFieldType, setNewFieldType] = useState('text');
 
@@ -750,11 +781,59 @@ function App() {
       setFormData(prev => ({ ...prev, [key]: value }));
     };
 
+    // 生成字段标识（基于中文名称）
+    const generateFieldKey = (label) => {
+      // 简单的拼音映射，实际项目中可以使用更完善的拼音库
+      const pinyinMap = {
+        '验证': 'verification', '方式': 'method', '体验': 'experience', '问题': 'issues',
+        '界面': 'interface', '保管': 'storage', '免费': 'free', '延长': 'extended',
+        '价格': 'price', '质量': 'quality', '照片': 'photo', '包裹': 'package',
+        '费用': 'fee', '海关': 'customs', '扣押': 'seizure', '险': 'insurance',
+        '丢失': 'loss', '损坏': 'damage', '延迟': 'delay', '工作': 'work',
+        '时间': 'time', '响应': 'response', '社区': 'community', '人数': 'members',
+        '活动': 'activity', '频率': 'frequency', '奖励': 'reward', '形式': 'form',
+        '拉新': 'referral', '链接': 'link', '接单': 'accept', '采购': 'purchase',
+        '发货': 'shipping', '到仓': 'arrival', '质检': 'qc', '上架': 'listing',
+        '优惠': 'discount', '金额': 'amount', '券码': 'coupon', '类型': 'type',
+        '门槛': 'threshold', '最高': 'max', '折扣': 'discount', '叠加': 'stackable',
+        '使用': 'usage', '语言': 'language', '货币': 'currency', '支持': 'support',
+        '佣金': 'commission', '基础': 'base', '计算': 'calculation', '机制': 'mechanism',
+        '积分': 'points', '获取': 'earn', '特色': 'special', '功能': 'feature',
+        '转运': 'forwarding', '地址': 'address', '信息': 'info', '要求': 'requirement',
+        '平台': 'platform', '系统': 'system', '安装包': 'package', '大小': 'size',
+        '服务': 'service', '收费': 'paid', '运单': 'waybill', '增值': 'valueAdded',
+        '定制': 'custom', '物流': 'logistics', '填写': 'fill', '提示': 'tip',
+        '说明': 'description', '展示': 'display', '售后': 'afterSales',
+        '退换货': 'return', '官方': 'official', '时效': 'timeLimit', '处理': 'process'
+      };
+      
+      // 尝试转换为英文，如果没有映射就使用简化版
+      let result = label;
+      Object.keys(pinyinMap).forEach(cn => {
+        result = result.replace(new RegExp(cn, 'g'), pinyinMap[cn]);
+      });
+      
+      // 如果还是中文，就用时间戳
+      if (/[\u4e00-\u9fa5]/.test(result)) {
+        result = `field_${Date.now()}`;
+      }
+      
+      // 清理和格式化
+      result = result.toLowerCase()
+        .replace(/[^a-z0-9]/g, '_')
+        .replace(/_+/g, '_')
+        .replace(/^_|_$/g, '');
+      
+      return result;
+    };
+
     const handleAddField = async () => {
-      if (!newFieldKey || !newFieldLabel) {
-        alert('请输入字段标识和标签');
+      if (!newFieldLabel) {
+        alert('请输入字段名称');
         return;
       }
+      
+      const newFieldKey = generateFieldKey(newFieldLabel);
       
       if (currentFields[newFieldKey]) {
         alert('该字段已存在！');
@@ -763,7 +842,6 @@ function App() {
 
       try {
         await handleAddFieldToAllPlatforms(sectionKey, newFieldKey, newFieldLabel, newFieldType);
-        setNewFieldKey('');
         setNewFieldLabel('');
         setNewFieldType('text');
         alert('字段添加成功！已同步到所有平台');
@@ -852,16 +930,9 @@ function App() {
             <div className="grid grid-cols-1 gap-3">
               <input
                 type="text"
-                value={newFieldKey}
-                onChange={e => setNewFieldKey(e.target.value)}
-                placeholder="字段标识（英文，如：newField）"
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-              <input
-                type="text"
                 value={newFieldLabel}
                 onChange={e => setNewFieldLabel(e.target.value)}
-                placeholder="字段标签（中文，如：新字段）"
+                placeholder="字段名称（如：新字段）"
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
               <select
@@ -989,16 +1060,9 @@ function App() {
               <div className="space-y-4">
                 <input
                   type="text"
-                  value={newSection.key}
-                  onChange={e => setNewSection({ ...newSection, key: e.target.value })}
-                  placeholder="板块标识（英文，如：newSection）"
-                  className="w-full p-2 border rounded-md"
-                />
-                <input
-                  type="text"
                   value={newSection.label}
                   onChange={e => setNewSection({ ...newSection, label: e.target.value })}
-                  placeholder="板块标签（中文，如：新板块）"
+                  placeholder="板块名称（如：新板块）"
                   className="w-full p-2 border rounded-md"
                 />
                 <select
@@ -1298,12 +1362,11 @@ function App() {
                         const fields = fieldConfigs[sectionKey] || {};
                         const sortedFields = Object.entries(fields)
                           .filter(([fieldKey, fieldConfig]) => fieldConfig.type !== 'image')
-                          .sort((a, b) => (a[1].displayOrder || 0) - (b[1].displayOrder || 0))
-                          .slice(0, 3); // 只显示前3个字段
+                          .sort((a, b) => (a[1].displayOrder || 0) - (b[1].displayOrder || 0));
 
                         return sortedFields.map(([fieldKey, fieldConfig], fieldIndex) => (
-                          <tr key={`${sectionKey}-${fieldKey}`} className={`border-b border-gray-200 ${(sectionIndex * 3 + fieldIndex) % 2 === 0 ? 'bg-gray-50' : ''}`}>
-                            <td className="px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 bg-gray-50">
+                          <tr key={`${sectionKey}-${fieldKey}`} className={`border-b border-gray-200 ${(sectionIndex * sortedFields.length + fieldIndex) % 2 === 0 ? 'bg-gray-50' : ''}`}>
+                            <td className={`px-6 py-3 font-semibold text-gray-900 sticky left-0 z-10 ${(sectionIndex * sortedFields.length + fieldIndex) % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
                               {fieldConfig.label}
                             </td>
                             {platforms
