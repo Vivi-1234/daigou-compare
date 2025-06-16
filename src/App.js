@@ -95,7 +95,6 @@ class SupabaseClient {
     }
   }
 
-  // 新增：板块配置相关API
   async getSectionConfigs() {
     return this.request('/section_configs?select=*&order=display_order');
   }
@@ -112,7 +111,6 @@ class SupabaseClient {
     return this.request(`/section_configs?section_key=eq.${sectionKey}`, { method: 'DELETE' });
   }
 
-  // 新增：字段配置相关API
   async getFieldConfigs() {
     return this.request('/field_configs?select=*&order=section_key,display_order');
   }
@@ -336,7 +334,6 @@ function App() {
         };
         (platformsData || []).forEach(platform => {
           formattedData[sectionKey].data[platform.id] = {};
-          // 根据字段配置初始化数据
           if (fieldsConfig[sectionKey]) {
             Object.keys(fieldsConfig[sectionKey]).forEach(fieldKey => {
               formattedData[sectionKey].data[platform.id][fieldKey] = '';
@@ -366,7 +363,7 @@ function App() {
       setAdvantagePlatforms(formattedAdvantage);
     } catch (error) {
       console.error('加载数据失败:', error);
-      alert('数据加载失败，请检查网络连接');
+      showToast('数据加载失败，请检查网络连接');
     } finally {
       setLoading(false);
     }
@@ -380,8 +377,9 @@ function App() {
     if (adminPassword === 'admin123') {
       setIsAdmin(true);
       setShowAdminModal(false);
+      showToast('管理员登录成功');
     } else {
-      alert('密码错误！');
+      showToast('密码错误');
     }
   };
 
@@ -389,6 +387,7 @@ function App() {
     setIsAdmin(false);
     setEditMode(null);
     setEditPlatformId(null);
+    showToast('已退出管理员模式');
   };
 
   const handleAddPlatform = async () => {
@@ -404,13 +403,11 @@ function App() {
         setPlatforms(prev => [...prev, created]);
         setSelectedPlatforms(prev => [...prev, created.id]);
         
-        // 为新平台初始化所有板块的数据
         setPlatformData(prev => {
           const updated = { ...prev };
           Object.keys(sectionConfigs).forEach(sectionKey => {
             if (updated[sectionKey]) {
               updated[sectionKey].data[created.id] = {};
-              // 根据字段配置初始化数据
               if (fieldConfigs[sectionKey]) {
                 Object.keys(fieldConfigs[sectionKey]).forEach(fieldKey => {
                   updated[sectionKey].data[created.id][fieldKey] = '';
@@ -422,7 +419,7 @@ function App() {
         });
         
         setNewPlatform({ name: '', url: '' });
-        showToast('平台添加成功！');
+        showToast('平台添加成功');
       }
     } catch (error) {
       console.error('添加平台失败:', error);
@@ -446,11 +443,10 @@ function App() {
           return updated;
         });
         
-        alert('平台删除成功！');
-        await loadData();
+        showToast('平台删除成功');
       } catch (error) {
         console.error('删除平台失败:', error);
-        alert('删除平台失败');
+        showToast('删除平台失败');
       }
     }
   };
@@ -473,11 +469,10 @@ function App() {
       
       setEditMode(null);
       setEditPlatformId(null);
-      alert('数据保存成功！');
-      await loadData();
+      showToast('数据保存成功');
     } catch (error) {
       console.error('保存数据失败:', error);
-      alert('保存数据失败');
+      showToast('保存数据失败');
     }
   };
 
@@ -498,21 +493,22 @@ function App() {
         ...prev,
         [sectionKey]: newAdvantage
       }));
+      showToast('优势标记更新成功');
     } catch (error) {
       console.error('更新优势标记失败:', error);
-      alert('更新优势标记失败');
+      showToast('更新优势标记失败');
     }
   };
 
   const handleImageUpload = async (e, sectionKey, platformId, fieldKey) => {
     const file = e.target.files[0];
     if (!file || !file.type.startsWith('image/')) {
-      alert('请上传图片文件！');
+      showToast('请上传图片文件');
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('图片大小不能超过 5MB！');
+      showToast('图片大小不能超过 5MB');
       return;
     }
 
@@ -533,11 +529,10 @@ function App() {
         return updated;
       });
       
-      alert('图片上传成功！');
-      await loadData();
+      showToast('图片上传成功');
     } catch (error) {
       console.error('图片上传失败:', error);
-      alert('图片上传失败');
+      showToast('图片上传失败');
     }
   };
 
@@ -562,23 +557,20 @@ function App() {
           return updated;
         });
         
-        alert('图片删除成功！');
-        await loadData();
+        showToast('图片删除成功');
       } catch (error) {
         console.error('删除图片失败:', error);
-        alert('删除图片失败');
+        showToast('删除图片失败');
       }
     }
   };
 
-  // 添加新板块
   const handleAddSection = async () => {
     if (!newSection.label) {
-      alert('请输入板块名称');
+      showToast('请输入板块名称');
       return;
     }
 
-    // 生成板块标识
     const generateSectionKey = (label) => {
       const pinyinMap = {
         '账户': 'account', '验证': 'verification', '方式': 'method', '支付': 'payment',
@@ -620,31 +612,63 @@ function App() {
         display_order: maxOrder + 1
       });
 
+      setSectionConfigs(prev => ({
+        ...prev,
+        [sectionKey]: {
+          label: newSection.label,
+          icon: getIconComponent(newSection.icon),
+          displayOrder: maxOrder + 1
+        }
+      }));
+
+      setPlatformData(prev => ({
+        ...prev,
+        [sectionKey]: {
+          label: newSection.label,
+          icon: getIconComponent(newSection.icon),
+          data: platforms.reduce((acc, platform) => ({
+            ...acc,
+            [platform.id]: {}
+          }), {})
+        }
+      }));
+
       setShowNewSectionModal(false);
       setNewSection({ key: '', label: '', icon: 'Package' });
-      alert('板块添加成功！');
-      await loadData();
+      showToast('板块添加成功');
     } catch (error) {
       console.error('添加板块失败:', error);
-      alert('添加板块失败');
+      showToast('添加板块失败');
     }
   };
 
-  // 删除板块
   const handleDeleteSection = async (sectionKey) => {
     if (window.confirm(`确认删除板块 "${sectionConfigs[sectionKey]?.label}" 吗？这将删除该板块的所有数据！`)) {
       try {
         await supabase.deleteSectionConfig(sectionKey);
-        alert('板块删除成功！');
-        await loadData();
+        setSectionConfigs(prev => {
+          const updated = { ...prev };
+          delete updated[sectionKey];
+          return updated;
+        });
+        setPlatformData(prev => {
+          const updated = { ...prev };
+          delete updated[sectionKey];
+          return updated;
+        });
+        setFieldConfigs(prev => {
+          const updated = { ...prev };
+          delete updated[sectionKey];
+          return updated;
+        });
+        showToast('板块删除成功');
       } catch (error) {
         console.error('删除板块失败:', error);
-        alert('删除板块失败');
+        showToast('删除板块失败');
       }
     }
   };
 
-  // 为所有平台添加字段
   const handleAddFieldToAllPlatforms = async (sectionKey, fieldKey, fieldLabel, fieldType = 'text') => {
     try {
       const maxOrder = fieldConfigs[sectionKey] 
@@ -659,7 +683,6 @@ function App() {
         display_order: maxOrder + 1
       });
 
-      // 更新字段配置状态
       setFieldConfigs(prev => ({
         ...prev,
         [sectionKey]: {
@@ -672,7 +695,6 @@ function App() {
         }
       }));
 
-      // 更新所有平台的数据
       const promises = platforms.map(platform => {
         const currentData = { ...platformData[sectionKey].data[platform.id] };
         currentData[fieldKey] = fieldType === 'image' ? '' : '';
@@ -681,7 +703,6 @@ function App() {
 
       await Promise.all(promises);
       
-      // 更新本地平台数据状态
       setPlatformData(prev => {
         const updated = { ...prev };
         platforms.forEach(platform => {
@@ -692,20 +713,18 @@ function App() {
         return updated;
       });
       
-      // 移除 await loadData(); - 不需要重新加载整个页面
+      showToast('字段已添加到所有平台');
     } catch (error) {
       console.error('添加字段失败:', error);
       throw error;
     }
   };
 
-  // 从所有平台删除字段
   const handleDeleteFieldFromAllPlatforms = async (sectionKey, fieldKey) => {
     if (window.confirm(`确认删除字段 "${getFieldLabel(fieldKey)}" 吗？这将从所有平台中删除该字段！`)) {
       try {
         await supabase.deleteFieldConfig(sectionKey, fieldKey);
 
-        // 更新所有平台的数据
         const promises = platforms.map(platform => {
           const currentData = { ...platformData[sectionKey].data[platform.id] };
           delete currentData[fieldKey];
@@ -713,10 +732,31 @@ function App() {
         });
 
         await Promise.all(promises);
-        await loadData();
+
+        setFieldConfigs(prev => {
+          const updated = { ...prev };
+          if (updated[sectionKey]) {
+            const newSectionFields = { ...updated[sectionKey] };
+            delete newSectionFields[fieldKey];
+            updated[sectionKey] = newSectionFields;
+          }
+          return updated;
+        });
+
+        setPlatformData(prev => {
+          const updated = { ...prev };
+          platforms.forEach(platform => {
+            if (updated[sectionKey] && updated[sectionKey].data[platform.id]) {
+              delete updated[sectionKey].data[platform.id][fieldKey];
+            }
+          });
+          return updated;
+        });
+
+        showToast('字段删除成功');
       } catch (error) {
         console.error('删除字段失败:', error);
-        alert('删除字段失败');
+        showToast('删除字段失败');
       }
     }
   };
@@ -736,7 +776,6 @@ function App() {
   );
 
   const renderSimpleData = (data, sectionKey) => {
-    console.log('Rendering data:', data, sectionKey);
     if (!data) return <span className="text-gray-400">数据缺失</span>;
     
     const fields = fieldConfigs[sectionKey] || {};
@@ -757,7 +796,6 @@ function App() {
   };
 
   const renderSectionData = (sectionKey, data) => {
-    console.log('Rendering data for', sectionKey, data);
     if (!data) return <span className="text-gray-400">数据缺失</span>;
 
     const fields = fieldConfigs[sectionKey] || {};
@@ -816,9 +854,7 @@ function App() {
       setFormData(prev => ({ ...prev, [key]: value }));
     };
 
-    // 生成字段标识（基于中文名称）
     const generateFieldKey = (label) => {
-      // 简单的拼音映射，实际项目中可以使用更完善的拼音库
       const pinyinMap = {
         '验证': 'verification', '方式': 'method', '体验': 'experience', '问题': 'issues',
         '界面': 'interface', '保管': 'storage', '免费': 'free', '延长': 'extended',
@@ -842,18 +878,15 @@ function App() {
         '退换货': 'return', '官方': 'official', '时效': 'timeLimit', '处理': 'process'
       };
       
-      // 尝试转换为英文，如果没有映射就使用简化版
       let result = label;
       Object.keys(pinyinMap).forEach(cn => {
         result = result.replace(new RegExp(cn, 'g'), pinyinMap[cn]);
       });
       
-      // 如果还是中文，就用时间戳
       if (/[\u4e00-\u9fa5]/.test(result)) {
         result = `field_${Date.now()}`;
       }
       
-      // 清理和格式化
       result = result.toLowerCase()
         .replace(/[^a-z0-9]/g, '_')
         .replace(/_+/g, '_')
@@ -864,14 +897,14 @@ function App() {
 
     const handleAddField = async () => {
       if (!newFieldLabel) {
-        alert('请输入字段名称');
+        showToast('请输入字段名称');
         return;
       }
       
       const newFieldKey = generateFieldKey(newFieldLabel);
       
       if (currentFields[newFieldKey]) {
-        alert('该字段已存在！');
+        showToast('该字段已存在');
         return;
       }
 
@@ -879,10 +912,11 @@ function App() {
         await handleAddFieldToAllPlatforms(sectionKey, newFieldKey, newFieldLabel, newFieldType);
         setNewFieldLabel('');
         setNewFieldType('text');
-        showToast('字段添加成功！已同步到所有平台');
-        
-        // 手动更新当前编辑表单的字段配置，避免页面刷新
-        window.location.reload(); // 临时刷新以显示新字段，后续可以优化为局部更新
+        setFormData(prev => ({
+          ...prev,
+          [newFieldKey]: newFieldType === 'image' ? '' : ''
+        }));
+        showToast('字段添加成功');
       } catch (error) {
         console.error('添加字段失败:', error);
         showToast('添加字段失败');
@@ -1130,6 +1164,12 @@ function App() {
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {showSuccessToast && (
+          <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg animate-fadeIn z-50">
+            {toastMessage}
           </div>
         )}
 
@@ -1447,7 +1487,6 @@ function App() {
         )}
       </div>
 
-      {/* 添加 CSS 动画样式 */}
       <style jsx>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(-20px); }
