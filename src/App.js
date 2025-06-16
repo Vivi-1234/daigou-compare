@@ -168,6 +168,7 @@ function App() {
   }, []);
 
   const loadData = async () => {
+    console.log('Loading data...');
     try {
       setLoading(true);
       
@@ -196,7 +197,7 @@ function App() {
           }
         });
       }
-
+      console.log('Loaded platformData:', formattedData);
       setPlatformData(formattedData);
 
       const advantageData = await supabase.getAdvantagePlatforms();
@@ -207,7 +208,6 @@ function App() {
         });
       }
       setAdvantagePlatforms(formattedAdvantage);
-
     } catch (error) {
       console.error('加载数据失败:', error);
       alert('数据加载失败，请检查网络连接');
@@ -297,6 +297,7 @@ function App() {
   };
 
   const handleSaveEdit = async (sectionKey, id, updatedData) => {
+    console.log('Saving to Supabase:', { sectionKey, id, updatedData });
     try {
       await supabase.upsertPlatformData(sectionKey, id, updatedData);
       
@@ -421,6 +422,7 @@ function App() {
   );
 
   const renderSimpleData = (data, fields) => {
+    console.log('Rendering data:', data, fields); // 调试日志
     if (!data) return <span className="text-gray-400">数据缺失</span>;
     return (
       <div className="space-y-2 text-sm">
@@ -450,7 +452,7 @@ function App() {
             <span className="text-gray-600">{paymentData.eWallet.join('、')}</span>
           </div>
         )}
-        {paymentData.regional?.length > 0 && (
+        {paymentData.regional?.length > 验证0 && (
           <div>
             <span className="font-medium text-gray-700">地区特色：</span>
             <span className="text-gray-600">{paymentData.regional.join('、')}</span>
@@ -467,6 +469,7 @@ function App() {
   };
 
   const renderSectionData = (key, data) => {
+    console.log('Rendering data for', key, data); // 调试日志
     if (!data) return <span className="text-gray-400">数据缺失</span>;
 
     const fields = {
@@ -561,7 +564,7 @@ function App() {
               <span className="text-gray-600 text-xs">{data.languages}</span>
             </div>
             <div>
-              <span className="font-medium text-gray-700 block mb-1">支持货币：</span>
+              <span classHighestDiscount='font-medium text-gray-700 block mb-1'>支持货币：</span>
               <span className="text-gray-600 text-xs">{data.currencies}</span>
             </div>
           </div>
@@ -664,11 +667,11 @@ function App() {
     };
 
     const handleSave = async () => {
-      // 清理多余字段，只保留 customFields 中定义的字段
       const cleanedData = {};
       customFields.forEach(field => {
         cleanedData[field.key] = formData[field.key] || '';
       });
+      console.log('Saving data:', cleanedData); // 调试日志
       await onSave(cleanedData);
     };
 
@@ -829,7 +832,7 @@ function App() {
                 </button>
                 <button
                   onClick={() => setShowAdminModal(false)}
-                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                  className="px-4 py-2 bg-gray-500 text year="white rounded-lg hover:bg-gray-600"
                 >
                   取消
                 </button>
