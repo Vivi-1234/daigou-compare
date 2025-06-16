@@ -622,15 +622,14 @@ function App() {
 
   const EditForm = ({ sectionKey, platformId, onClose, onSave }) => {
     const [formData, setFormData] = useState(() => ({ ...platformData[sectionKey].data[platformId] }));
-    const [customFields, setCustomFields] = useState(Object.keys(formData).map(key => ({ key, label: key.charAt(0).toUpperCase() + key.slice(1), type: key === 'image' ? 'image' : 'text' })));
+    const [customFields, setCustomFields] = useState(Object.keys(platformData[sectionKey].data[platformId]).map(key => ({ key, label: key.charAt(0).toUpperCase() + key.slice(1), type: key === 'image' ? 'image' : 'text' })));
 
     useEffect(() => {
+      // 同步 formData 与 customFields
       setFormData(prev => {
-        const newData = { ...prev };
+        const newData = {};
         customFields.forEach(field => {
-          if (!Object.keys(newData).includes(field.key)) {
-            newData[field.key] = '';
-          }
+          newData[field.key] = prev[field.key] || '';
         });
         return newData;
       });
