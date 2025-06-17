@@ -930,7 +930,14 @@ function App() {
                               setPreviewImage(image.url);
                             }}
                           />
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+                          <div 
+                            className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              scrollPosition.current = window.scrollY;
+                              setPreviewImage(image.url);
+                            }}
+                          >
                             <ZoomIn className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                           </div>
                           <div className="absolute top-3 left-3 px-2 py-1 rounded-full bg-blue-500 text-white text-sm font-medium">
@@ -1630,7 +1637,7 @@ function App() {
 
         {previewImage && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-60"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 setPreviewImage(null);
@@ -1638,18 +1645,18 @@ function App() {
               }
             }}
           >
-            <div className="relative">
+            <div className="relative max-w-4xl max-h-[90vh] overflow-auto">
               <img
                 src={previewImage}
                 alt="Preview"
-                className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
+                className="max-w-full max-h-[90vh] object-contain rounded-lg"
               />
               <button
                 onClick={() => {
                   setPreviewImage(null);
                   window.scrollTo(0, scrollPosition.current);
                 }}
-                className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
+                className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 z-70"
                 title="关闭"
               >
                 <X className="w-6 h-6" />
@@ -1660,7 +1667,7 @@ function App() {
 
         {selectedImageInfo && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-60"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 setSelectedImageInfo(null);
