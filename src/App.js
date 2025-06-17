@@ -1467,23 +1467,23 @@ function App() {
               <Filter className="w-5 h-5 mr-2 text-blue-500" />
               选择对比平台
             </h3>
-            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2">
+            <div className="flex items-center space-x-2">
               <button
                 onClick={() => setSelectedPlatforms(platforms.map(p => p.id))}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm min-h-[40px]"
               >
                 全选
               </button>
               <button
                 onClick={() => setSelectedPlatforms([])}
-                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm"
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm min-h-[40px]"
               >
                 清空
               </button>
               {isAdmin && (
                 <button
                   onClick={() => setShowNewSectionModal(true)}
-                  className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm"
+                  className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm mt-2 sm:mt-0"
                 >
                   <Plus className="w-4 h-4 inline mr-1" /> 新增板块
                 </button>
@@ -1833,11 +1833,10 @@ function App() {
             height: 150px !important;
           }
           /* Ensure "全选" and "清空" are side by side and aligned on mobile */
-          .flex-col.sm\\:flex-row > div:nth-child(2) {
-            flex-direction: row !important;
-            justify-content: center;
+          .flex.items-center.space-x-2 > button {
+            min-height: 40px !important;
+            display: flex;
             align-items: center;
-            gap: 0.5rem;
           }
         }
       `}</style>
