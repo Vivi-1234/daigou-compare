@@ -1298,14 +1298,6 @@ function App() {
     );
   }
 
-  // 监听弹窗状态变化，恢复滚动位置
-  useEffect(() => {
-    if (!previewImage && !selectedImageInfo) {
-      window.scrollTo(0, scrollPosition.current);
-      console.log('Restored scroll position:', scrollPosition.current);
-    }
-  }, [previewImage, selectedImageInfo]);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -1677,7 +1669,7 @@ function App() {
 
         {selectedImageInfo && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-1000" // 提高到 1000
+            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-70" // 提高 z-index 到 70
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 e.stopPropagation();
