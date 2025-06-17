@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   ShoppingCart, CreditCard, Package, Star, Truck, MessageCircle, Users, Clock, Gift, Globe, 
   Percent, Award, ArrowUpDown, Link, Smartphone, Plus, Filter, Eye, ChevronDown, ChevronUp, 
@@ -181,6 +181,8 @@ function App() {
   const [newSection, setNewSection] = useState({ key: '', label: '', icon: 'Package' });
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [selectedImageInfo, setSelectedImageInfo] = useState(null);
+  const scrollPosition = useRef(0);
 
   // 显示成功提示
   const showToast = (message) => {
@@ -912,50 +914,58 @@ function App() {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {images.map((image, index) => (
-                    <div key={`${image.platformId}-${index}`} className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                      <div className="relative group">
-                        <img
-                          src={image.url}
-                          alt={image.description}
-                          className="w-full h-48 object-cover cursor-pointer"
-                          onClick={() => setPreviewImage(image.url)}
-                        />
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
-                          <ZoomIn className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  {images.map((image, index) => {
+                    const platformDataForImage = platformData[sectionKey]?.data[image.platformId] || {};
+                    const hasAdvantage = isAdvantage(sectionKey, image.platformId);
+
+                    return (
+                      <div key={`${image.platformId}-${index}`} className={`bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${hasAdvantage ? 'border-yellow-400 bg-gradient-to-br from-yellow-50 to-orange-50 shadow-lg' : 'border-gray-100'}`}>
+                        <div className="relative group">
+                          <img
+                            src={image.url}
+                            alt={image.description}
+                            className="w-full h-48 object-cover cursor-pointer"
+                            onClick={() => {
+                              scrollPosition.current = window.scrollY;
+                              setPreviewImage(image.url);
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+                            <ZoomIn className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          </div>
+                          <div className="absolute top-3 left-3 px-2 py-1 rounded-full bg-blue-500 text-white text-sm font-medium">
+                            {image.platformName}
+                          </div>
                         </div>
-                        <div className="absolute top-3 left-3 px-2 py-1 rounded-full bg-blue-500 text-white text-sm font-medium">
-                          {image.platformName}
+                        
+                        <div className="p-4">
+                          <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2">
+                            {image.description}
+                          </h4>
+                          <div className="flex items-center justify-between text-sm text-gray-500">
+                            <span>上传时间</span>
+                            <span>{image.uploadTime}</span>
+                          </div>
+                          <div className="flex items-center gap-2 mt-3">
+                            <button
+                              onClick={() => setSelectedImageInfo({ sectionKey, platformId: image.platformId, platformName: image.platformName })}
+                              className="flex-1 bg-blue-50 text-blue-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors flex items-center justify-center gap-1"
+                            >
+                              <Eye className="w-4 h-4" />
+                              查看详情
+                            </button>
+                            <button
+                              onClick={() => window.open(image.url, '_blank')}
+                              className="bg-gray-50 text-gray-600 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                              title="新窗口打开"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
                       </div>
-                      
-                      <div className="p-4">
-                        <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-                          {image.description}
-                        </h4>
-                        <div className="flex items-center justify-between text-sm text-gray-500">
-                          <span>上传时间</span>
-                          <span>{image.uploadTime}</span>
-                        </div>
-                        <div className="flex items-center gap-2 mt-3">
-                          <button
-                            onClick={() => setPreviewImage(image.url)}
-                            className="flex-1 bg-blue-50 text-blue-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors flex items-center justify-center gap-1"
-                          >
-                            <Eye className="w-4 h-4" />
-                            查看详情
-                          </button>
-                          <button
-                            onClick={() => window.open(image.url, '_blank')}
-                            className="bg-gray-50 text-gray-600 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                            title="新窗口打开"
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             );
@@ -1621,7 +1631,12 @@ function App() {
         {previewImage && (
           <div
             className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
-            onClick={() => setPreviewImage(null)}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setPreviewImage(null);
+                window.scrollTo(0, scrollPosition.current);
+              }
+            }}
           >
             <div className="relative">
               <img
@@ -1630,11 +1645,40 @@ function App() {
                 className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
               />
               <button
-                onClick={() => setPreviewImage(null)}
+                onClick={() => {
+                  setPreviewImage(null);
+                  window.scrollTo(0, scrollPosition.current);
+                }}
                 className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
                 title="关闭"
               >
                 <X className="w-6 h-6" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {selectedImageInfo && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setSelectedImageInfo(null);
+                window.scrollTo(0, scrollPosition.current);
+              }
+            }}
+          >
+            <div className="bg-white p-6 rounded-lg max-h-[80vh] overflow-y-auto w-full max-w-2xl">
+              <h3 className="text-xl font-bold mb-4">{selectedImageInfo.platformName} - {sectionConfigs[selectedImageInfo.sectionKey]?.label}</h3>
+              {renderSectionData(selectedImageInfo.sectionKey, platformData[selectedImageInfo.sectionKey]?.data[selectedImageInfo.platformId] || {})}
+              <button
+                onClick={() => {
+                  setSelectedImageInfo(null);
+                  window.scrollTo(0, scrollPosition.current);
+                }}
+                className="mt-4 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+              >
+                <X className="w-4 h-4 inline mr-1" /> 关闭
               </button>
             </div>
           </div>
