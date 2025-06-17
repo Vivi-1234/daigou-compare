@@ -1641,6 +1641,7 @@ function App() {
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 setPreviewImage(null);
+                // 保持当前滚动位置
                 window.scrollTo(0, scrollPosition.current);
               }
             }}
@@ -1652,8 +1653,10 @@ function App() {
                 className="max-w-full max-h-[90vh] object-contain rounded-lg"
               />
               <button
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   setPreviewImage(null);
+                  // 保持当前滚动位置
                   window.scrollTo(0, scrollPosition.current);
                 }}
                 className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 z-70"
@@ -1671,6 +1674,7 @@ function App() {
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 setSelectedImageInfo(null);
+                // 保持当前滚动位置
                 window.scrollTo(0, scrollPosition.current);
               }
             }}
@@ -1679,8 +1683,10 @@ function App() {
               <h3 className="text-xl font-bold mb-4">{selectedImageInfo.platformName} - {sectionConfigs[selectedImageInfo.sectionKey]?.label}</h3>
               {renderSectionData(selectedImageInfo.sectionKey, platformData[selectedImageInfo.sectionKey]?.data[selectedImageInfo.platformId] || {})}
               <button
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   setSelectedImageInfo(null);
+                  // 保持当前滚动位置
                   window.scrollTo(0, scrollPosition.current);
                 }}
                 className="mt-4 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
