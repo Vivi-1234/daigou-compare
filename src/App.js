@@ -1832,9 +1832,9 @@ function App() {
           .h-48 {
             height: 150px !important;
           }
-          /* Align "全选" and "清空" vertically on mobile */
+          /* Ensure "全选" and "清空" are side by side and aligned on mobile */
           .flex-col.sm\\:flex-row > div:nth-child(2) {
-            flex-direction: column sm:flex-row !important;
+            flex-direction: row !important;
             justify-content: center;
             align-items: center;
             gap: 0.5rem;
