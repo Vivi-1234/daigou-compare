@@ -1267,7 +1267,10 @@ function App() {
             <Save className="w-4 h-4 inline mr-1" /> 保存
           </button>
           <button
-            onClick={onClose}
+            onClick={() => {
+              onClose();
+              window.scrollTo(0, scrollPosition.current);
+            }}
             className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
           >
             <X className="w-4 h-4 inline mr-1" /> 取消
@@ -1330,7 +1333,15 @@ function App() {
         </div>
 
         {showAdminModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setShowAdminModal(false);
+                window.scrollTo(0, scrollPosition.current);
+              }
+            }}
+          >
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <h3 className="text-lg font-bold mb-4">管理员登录</h3>
               <input
@@ -1343,13 +1354,19 @@ function App() {
               />
               <div className="flex space-x-2">
                 <button
-                  onClick={handleAdminLogin}
+                  onClick={() => {
+                    handleAdminLogin();
+                    window.scrollTo(0, scrollPosition.current);
+                  }}
                   className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                 >
                   登录
                 </button>
                 <button
-                  onClick={() => setShowAdminModal(false)}
+                  onClick={() => {
+                    setShowAdminModal(false);
+                    window.scrollTo(0, scrollPosition.current);
+                  }}
                   className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
                 >
                   取消
@@ -1360,7 +1377,15 @@ function App() {
         )}
 
         {showNewSectionModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setShowNewSectionModal(false);
+                window.scrollTo(0, scrollPosition.current);
+              }
+            }}
+          >
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <h3 className="text-lg font-bold mb-4">添加新板块</h3>
               <div className="space-y-4">
@@ -1385,13 +1410,19 @@ function App() {
               </div>
               <div className="flex space-x-2 mt-4">
                 <button
-                  onClick={handleAddSection}
+                  onClick={() => {
+                    handleAddSection();
+                    window.scrollTo(0, scrollPosition.current);
+                  }}
                   className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                 >
                   添加
                 </button>
                 <button
-                  onClick={() => setShowNewSectionModal(false)}
+                  onClick={() => {
+                    setShowNewSectionModal(false);
+                    window.scrollTo(0, scrollPosition.current);
+                  }}
                   className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
                 >
                   取消
@@ -1617,7 +1648,10 @@ function App() {
                                     <EditForm
                                       sectionKey={key}
                                       platformId={platform.id}
-                                      onClose={() => setEditMode(null)}
+                                      onClose={() => {
+                                        setEditMode(null);
+                                        window.scrollTo(0, scrollPosition.current);
+                                      }}
                                       onSave={formData => handleSaveEdit(key, platform.id, formData)}
                                     />
                                   ) : (
@@ -1643,9 +1677,7 @@ function App() {
             className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[9999]"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
-                e.stopPropagation();
                 setPreviewImage(null);
-                // 仅在关闭时恢复滚动位置
                 window.scrollTo(0, scrollPosition.current);
               }
             }}
@@ -1660,7 +1692,6 @@ function App() {
                 onClick={(e) => {
                   e.stopPropagation();
                   setPreviewImage(null);
-                  // 仅在关闭时恢复滚动位置
                   window.scrollTo(0, scrollPosition.current);
                 }}
                 className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
@@ -1677,7 +1708,6 @@ function App() {
             className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-9999"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
-                e.stopPropagation();
                 setSelectedImageInfo(null);
                 window.scrollTo(0, scrollPosition.current);
               }
