@@ -364,6 +364,193 @@ function App() {
       // 加载板块配置
       const sectionsData = await supabase.getSectionConfigs();
       const sectionsConfig = {};
+// 显示成功提示
+  const showToast = (message) => {
+    setToastMessage(message);
+    setShowSuccessToast(true);
+    setTimeout(() => {
+      setShowSuccessToast(false);
+    }, 3000);
+  };
+
+  // 可选图标列表
+  const iconOptions = [
+    { value: 'CreditCard', label: '信用卡', component: CreditCard },
+    { value: 'Package', label: '包裹', component: Package },
+    { value: 'Star', label: '星星', component: Star },
+    { value: 'Truck', label: '卡车', component: Truck },
+    { value: 'MessageCircle', label: '消息', component: MessageCircle },
+    { value: 'Users', label: '用户', component: Users },
+    { value: 'Clock', label: '时钟', component: Clock },
+    { value: 'Gift', label: '礼物', component: Gift },
+    { value: 'Globe', label: '全球', component: Globe },
+    { value: 'Percent', label: '百分比', component: Percent },
+    { value: 'Award', label: '奖励', component: Award },
+    { value: 'Link', label: '链接', component: Link },
+    { value: 'Smartphone', label: '手机', component: Smartphone },
+    { value: 'Settings', label: '设置', component: Settings }
+  ];
+
+  // 字段类型中文映射
+  const fieldTypeLabels = {
+    'method': '验证方式',
+    'issues': '体验问题',
+    'verificationInterface': '验证界面',
+    'image': '图片',
+    'creditCard': '信用卡/借记卡',
+    'eWallet': '电子钱包',
+    'regional': '地区特色',
+    'other': '其他',
+    'free': '免费保管期',
+    'extended': '延长存储',
+    'extra': '额外QC价格',
+    'quality': '照片质量',
+    'rehearsal': '预演包裹费',
+    'seizure': '海关扣押险',
+    'loss': '丢失/损坏险',
+    'delay': '延迟险',
+    'hours': '工作时间',
+    'days': '工作日',
+    'response': '响应时间',
+    'members': '社区人数',
+    'activities': '活动频率',
+    'rewards': '奖励形式',
+    'referral': '拉新奖励',
+    'dcLink': 'DC链接',
+    'accept': '接单时间',
+    'purchase': '采购时间',
+    'shipping': '卖家发货',
+    'arrival': '到仓时间',
+    'qc': '质检上架',
+    'amount': '优惠金额',
+    'type': '券码类型',
+    'threshold': '使用门槛',
+    'maxDiscount': '最高折扣',
+    'stackable': '叠加使用',
+    'languages': '支持语言',
+    'currencies': '支持货币',
+    'base': '基础佣金',
+    'max': '最高佣金',
+    'mechanism': '计算机制',
+    'points': '积分获取',
+    'usage': '积分使用',
+    'special': '特色功能',
+    'address': '转运地址',
+    'requirements': '信息要求',
+    'platforms': '支持平台',
+    'systems': '支持系统',
+    'size': '安装包大小',
+    'features': '特色功能',
+    'paid': '收费服务',
+    'hasService': '是否有定制物流',
+    'needInfo': '需要填写的信息',
+    'tips': '提示信息',
+    'feeDescription': '费用说明',
+    'displayInterface': '展示界面',
+    'returnFee': '商品退换货费用',
+    'returnTime': '商品退换货官方时效',
+    'processingTime': '包裹售后处理时间'
+  };
+
+  const getFieldLabel = (fieldKey) => {
+    return fieldTypeLabels[fieldKey] || fieldKey;
+  };
+
+  const getIconComponent = (iconName) => {
+    const iconOption = iconOptions.find(opt => opt.value === iconName);
+    return iconOption ? iconOption.component : Package;
+  };
+
+  // 修改后的初始化图片画廊数据函数
+  const initializeGalleryData = (platformData, platformsArray) => {
+    const images = {};
+    Object.entries(platformData).forEach(([sectionKey, section]) => {
+      images[sectionKey] = [];
+      Object.entries(section.data).forEach(([platformId, data]) => {
+        Object.entries(data).forEach(([fieldKey, value]) => {
+          if (fieldKey === 'image' && value) {
+            const platform = platformsArray.find(p => p.id == platformId);
+            images[sectionKey].push({
+              platformId: parseInt(platformId),
+              platformName: platform?.name || 'Unknown',
+              url: value,
+              description: `${platform?.name} - ${section.label}`,
+              uploadTime: new Date().toISOString().split('T')[0]
+            });
+          }
+        });
+      });
+    });
+    setGalleryImages(images);
+  };
+
+  // 修改后的从平台对比页面同步图片到可视化展示中心
+  const syncImageToGallery = (sectionKey, platformId, imageUrl, description) => {
+    // 确保使用最新的 platforms 状态
+    setPlatforms(currentPlatforms => {
+      const platform = currentPlatforms.find(p => p.id === platformId);
+      if (!platform) {
+        console.warn(`Platform with ID ${platformId} not found`);
+        return currentPlatforms;
+      }
+
+      setGalleryImages(prev => {
+        const updated = { ...prev };
+        if (!updated[sectionKey]) {
+          updated[sectionKey] = [];
+        }
+        
+        const existingIndex = updated[sectionKey].findIndex(
+          img => img.platformId === platformId
+        );
+        
+        const imageData = {
+          platformId,
+          platformName: platform.name,
+          url: imageUrl,
+          description: description || `${platform.name} - ${sectionConfigs[sectionKey]?.label}`,
+          uploadTime: new Date().toISOString().split('T')[0]
+        };
+        
+        if (existingIndex >= 0) {
+          updated[sectionKey][existingIndex] = imageData;
+        } else {
+          updated[sectionKey].push(imageData);
+        }
+        
+        return updated;
+      });
+      
+      console.log(`图片已同步到可视化展示中心: ${platform.name} - ${sectionConfigs[sectionKey]?.label}`);
+      return currentPlatforms;
+    });
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    // 模态框关闭后同步滚动位置
+    if (!previewImage && !selectedImageInfo && !showAdminModal && !showNewSectionModal && !editMode) {
+      console.log('Syncing scroll position after modal close:', scrollPosition.current, 'current scrollY:', window.scrollY);
+      window.scrollTo(0, scrollPosition.current);
+    }
+  }, [previewImage, selectedImageInfo, showAdminModal, showNewSectionModal, editMode]);
+
+  const loadData = async () => {
+    console.log('Loading data...');
+    try {
+      setLoading(true);
+      
+      // 加载平台数据
+      const platformsData = await supabase.getPlatforms();
+      setPlatforms(platformsData || []);
+      setSelectedPlatforms((platformsData || []).map(p => p.id));
+
+      // 加载板块配置
+      const sectionsData = await supabase.getSectionConfigs();
+      const sectionsConfig = {};
       if (sectionsData) {
         sectionsData.forEach(section => {
           sectionsConfig[section.section_key] = {
@@ -432,8 +619,8 @@ function App() {
       }
       setAdvantagePlatforms(formattedAdvantage);
 
-      // 初始化图片画廊数据
-      initializeGalleryData(formattedData);
+      // 修改后的初始化图片画廊数据调用
+      initializeGalleryData(formattedData, platformsData || []);
     } catch (error) {
       console.error('加载数据失败:', error);
       showToast('数据加载失败，请检查网络连接');
