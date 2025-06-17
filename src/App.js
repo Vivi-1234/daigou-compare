@@ -1044,7 +1044,10 @@ function App() {
                   alt={`${fieldConfig.label} Image`}
                   className="h-40 w-40 object-contain rounded-lg border border-gray-200 shadow-md hover:scale-105 transition-transform cursor-pointer"
                   loading="lazy"
-                  onClick={() => setPreviewImage(data[fieldKey])}
+                  onClick={() => {
+                    scrollPosition.current = window.scrollY;
+                    setPreviewImage(data[fieldKey]);
+                  }}
                 />
                 {isAdmin && (
                   <button
@@ -1636,41 +1639,42 @@ function App() {
         {activeTab === 'gallery' && <VisualShowcase />}
 
         {previewImage && (
-  <div
-    className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[9999]"
-    onClick={(e) => {
-      if (e.target === e.currentTarget) {
-        e.stopPropagation();
-        setPreviewImage(null);
-        window.scrollTo(0, scrollPosition.current);
-      }
-    }}
-  >
-    <div className="relative max-w-4xl max-h-[90vh] overflow-auto">
-      <img
-        src={previewImage}
-        alt="Preview"
-        className="max-w-full max-h-[90vh] object-contain rounded-lg"
-      />
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          setPreviewImage(null);
-          window.scrollTo(0, scrollPosition.current);
-        }}
-        className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
-        title="关闭"
-      >
-        <X className="w-6 h-6" />
-      </button>
-    </div>
-  </div>
-)}
-
+          <div
+            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[9999]"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                e.stopPropagation();
+                setPreviewImage(null);
+                // 仅在关闭时恢复滚动位置
+                window.scrollTo(0, scrollPosition.current);
+              }
+            }}
+          >
+            <div className="relative max-w-4xl max-h-[90vh] overflow-auto">
+              <img
+                src={previewImage}
+                alt="Preview"
+                className="max-w-full max-h-[90vh] object-contain rounded-lg"
+              />
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setPreviewImage(null);
+                  // 仅在关闭时恢复滚动位置
+                  window.scrollTo(0, scrollPosition.current);
+                }}
+                className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
+                title="关闭"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+          </div>
+        )}
 
         {selectedImageInfo && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-9999" // 提高 z-index 到 70
+            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-9999"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 e.stopPropagation();
