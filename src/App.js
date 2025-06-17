@@ -924,7 +924,7 @@ function App() {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {images.map((image, index) => {
                     const platformDataForImage = platformData[sectionKey]?.data[image.platformId] || {};
                     const hasAdvantage = isAdvantage(sectionKey, image.platformId);
@@ -1329,9 +1329,6 @@ function App() {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">
             代购平台详细对比系统
           </h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            专业的代购平台对比分析工具
-          </p>
           <div className="mt-2 text-sm text-green-600 flex items-center justify-center">
             <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
             已连接到 Supabase 云数据库
@@ -1470,7 +1467,7 @@ function App() {
               <Filter className="w-5 h-5 mr-2 text-blue-500" />
               选择对比平台
             </h3>
-            <div className="flex space-x-2">
+            <div className="flex space-x-2 flex-wrap gap-2">
               <button
                 onClick={() => setSelectedPlatforms(platforms.map(p => p.id))}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
@@ -1610,7 +1607,7 @@ function App() {
                       {selectedPlatforms.length === 0 ? (
                         <p className="text-center text-gray-500">请至少选择一个平台进行对比</p>
                       ) : (
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                           {platforms
                             .filter(p => selectedPlatforms.includes(p.id))
                             .map(platform => {
@@ -1770,6 +1767,75 @@ function App() {
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
+        }
+        /* Mobile-specific styles */
+        @media (max-width: 640px) {
+          .max-w-7xl {
+            padding: 0 1rem;
+          }
+          h1 {
+            font-size: 2rem;
+          }
+          .flex-row {
+            flex-direction: column;
+          }
+          .grid-cols-3 {
+            grid-template-columns: 1fr;
+          }
+          .grid-cols-2 {
+            grid-template-columns: 1fr;
+          }
+          .px-6 {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+          }
+          .py-6 {
+            padding-top: 1rem !important;
+            padding-bottom: 1rem !important;
+          }
+          .w-40 {
+            width: 100% !important;
+            height: auto !important;
+          }
+          .h-40 {
+            height: auto !important;
+          }
+          .text-xl {
+            font-size: 1.25rem !important;
+          }
+          .text-lg {
+            font-size: 1.125rem !important;
+          }
+          .p-4 {
+            padding: 0.75rem !important;
+          }
+          .px-4 {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+          }
+          .py-2 {
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+          }
+          .space-x-4 {
+            gap: 0.5rem !important;
+          }
+          .flex-wrap {
+            flex-direction: column;
+            align-items: center;
+          }
+          .w-full {
+            width: 100% !important;
+          }
+          .max-w-md {
+            max-width: 90% !important;
+          }
+          .max-w-2xl {
+            max-width: 95% !important;
+          }
+          .h-48 {
+            height: 150px !important;
+          }
         }
       `}</style>
     </div>
