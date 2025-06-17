@@ -924,7 +924,7 @@ function App() {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {images.map((image, index) => {
                     const platformDataForImage = platformData[sectionKey]?.data[image.platformId] || {};
                     const hasAdvantage = isAdvantage(sectionKey, image.platformId);
@@ -1490,10 +1490,10 @@ function App() {
               )}
             </div>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
             {platforms.map((platform) => (
               <div key={platform.id} className="flex items-center">
-                <label className="flex items-center cursor-pointer">
+                <label className="flex items-center cursor-pointer w-full">
                   <input
                     type="checkbox"
                     checked={selectedPlatforms.includes(platform.id)}
@@ -1506,7 +1506,7 @@ function App() {
                     }}
                     className="sr-only"
                   />
-                  <div className={`flex items-center px-4 py-2 rounded-xl border-2 transition-all duration-200 ${
+                  <div className={`flex items-center px-4 py-2 rounded-xl border-2 transition-all duration-200 w-full ${
                     selectedPlatforms.includes(platform.id)
                       ? 'border-blue-500 bg-blue-50 text-blue-700'
                       : 'border-gray-200 bg-white hover:border-gray-300'
@@ -1517,7 +1517,7 @@ function App() {
                       className="w-6 h-6 mr-2 object-contain"
                       onError={(e) => { e.target.style.display = 'none'; }}
                     />
-                    <span className="font-medium">{platform.name}</span>
+                    <span className="font-medium text-sm truncate">{platform.name}</span>
                   </div>
                 </label>
                 {isAdmin && (
@@ -1768,7 +1768,7 @@ function App() {
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
-        /* Mobile-specific styles */
+        /* Mobile-specific styles for max 2 rows */
         @media (max-width: 640px) {
           .max-w-7xl {
             padding: 0 1rem;
@@ -1776,14 +1776,10 @@ function App() {
           h1 {
             font-size: 2rem;
           }
-          .flex-row {
-            flex-direction: column;
-          }
-          .grid-cols-3 {
-            grid-template-columns: 1fr;
-          }
-          .grid-cols-2 {
-            grid-template-columns: 1fr;
+          .grid-cols-5 {
+            grid-template-columns: repeat(2, 1fr) !important; /* Force 2 columns on mobile */
+            max-height: 20rem; /* Limit to approximately 2 rows */
+            overflow-y: auto; /* Enable scrolling if more than 2 rows */
           }
           .px-6 {
             padding-left: 1rem !important;
