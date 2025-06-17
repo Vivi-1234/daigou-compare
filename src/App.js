@@ -1640,8 +1640,8 @@ function App() {
             className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-60"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
+                e.stopPropagation();
                 setPreviewImage(null);
-                // 保持当前滚动位置
                 window.scrollTo(0, scrollPosition.current);
               }
             }}
@@ -1656,7 +1656,6 @@ function App() {
                 onClick={(e) => {
                   e.stopPropagation();
                   setPreviewImage(null);
-                  // 保持当前滚动位置
                   window.scrollTo(0, scrollPosition.current);
                 }}
                 className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 z-70"
@@ -1670,26 +1669,25 @@ function App() {
 
         {selectedImageInfo && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-60"
+            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-70" // 提高 z-index 到 70
             onClick={(e) => {
               if (e.target === e.currentTarget) {
+                e.stopPropagation();
                 setSelectedImageInfo(null);
-                // 保持当前滚动位置
                 window.scrollTo(0, scrollPosition.current);
               }
             }}
           >
-            <div className="bg-white p-6 rounded-lg max-h-[80vh] overflow-y-auto w-full max-w-2xl">
+            <div className="bg-white p-6 rounded-lg max-h-[80vh] overflow-y-auto w-full max-w-2xl relative">
               <h3 className="text-xl font-bold mb-4">{selectedImageInfo.platformName} - {sectionConfigs[selectedImageInfo.sectionKey]?.label}</h3>
               {renderSectionData(selectedImageInfo.sectionKey, platformData[selectedImageInfo.sectionKey]?.data[selectedImageInfo.platformId] || {})}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setSelectedImageInfo(null);
-                  // 保持当前滚动位置
                   window.scrollTo(0, scrollPosition.current);
                 }}
-                className="mt-4 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                className="mt-4 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 absolute top-2 right-2"
               >
                 <X className="w-4 h-4 inline mr-1" /> 关闭
               </button>
