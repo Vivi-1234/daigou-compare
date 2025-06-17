@@ -343,6 +343,14 @@ function App() {
     loadData();
   }, []);
 
+  useEffect(() => {
+    // 模态框关闭后同步滚动位置
+    if (!previewImage && !selectedImageInfo && !showAdminModal && !showNewSectionModal && !editMode) {
+      console.log('Syncing scroll position after modal close:', scrollPosition.current, 'current scrollY:', window.scrollY);
+      window.scrollTo(0, scrollPosition.current);
+    }
+  }, [previewImage, selectedImageInfo, showAdminModal, showNewSectionModal, editMode]);
+
   const loadData = async () => {
     console.log('Loading data...');
     try {
@@ -443,6 +451,7 @@ function App() {
       setIsAdmin(true);
       setShowAdminModal(false);
       showToast('管理员登录成功');
+      window.scrollTo(0, scrollPosition.current);
     } else {
       showToast('密码错误');
     }
@@ -453,6 +462,7 @@ function App() {
     setEditMode(null);
     setEditPlatformId(null);
     showToast('已退出管理员模式');
+    window.scrollTo(0, scrollPosition.current);
   };
 
   const handleAddPlatform = async () => {
@@ -725,6 +735,7 @@ function App() {
       setShowNewSectionModal(false);
       setNewSection({ key: '', label: '', icon: 'Package' });
       showToast('板块添加成功');
+      window.scrollTo(0, scrollPosition.current);
     } catch (error) {
       console.error('添加板块失败:', error);
       showToast('添加板块失败');
@@ -927,6 +938,7 @@ function App() {
                             className="w-full h-48 object-cover cursor-pointer"
                             onClick={() => {
                               scrollPosition.current = window.scrollY;
+                              console.log('Opening image preview, scrollPosition set to:', scrollPosition.current);
                               setPreviewImage(image.url);
                             }}
                           />
@@ -935,6 +947,7 @@ function App() {
                             onClick={(e) => {
                               e.stopPropagation();
                               scrollPosition.current = window.scrollY;
+                              console.log('Opening image preview via overlay, scrollPosition set to:', scrollPosition.current);
                               setPreviewImage(image.url);
                             }}
                           >
@@ -1046,6 +1059,7 @@ function App() {
                   loading="lazy"
                   onClick={() => {
                     scrollPosition.current = window.scrollY;
+                    console.log('Opening image in section, scrollPosition set to:', scrollPosition.current);
                     setPreviewImage(data[fieldKey]);
                   }}
                 />
@@ -1268,6 +1282,7 @@ function App() {
           </button>
           <button
             onClick={() => {
+              console.log('Closing EditForm, scrollPosition:', scrollPosition.current, 'current scrollY:', window.scrollY);
               onClose();
               window.scrollTo(0, scrollPosition.current);
             }}
@@ -1337,6 +1352,7 @@ function App() {
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
+                console.log('Closing adminModal overlay, scrollPosition:', scrollPosition.current, 'current scrollY:', window.scrollY);
                 setShowAdminModal(false);
                 window.scrollTo(0, scrollPosition.current);
               }
@@ -1355,6 +1371,7 @@ function App() {
               <div className="flex space-x-2">
                 <button
                   onClick={() => {
+                    console.log('Closing adminModal login button, scrollPosition:', scrollPosition.current, 'current scrollY:', window.scrollY);
                     handleAdminLogin();
                     window.scrollTo(0, scrollPosition.current);
                   }}
@@ -1364,6 +1381,7 @@ function App() {
                 </button>
                 <button
                   onClick={() => {
+                    console.log('Closing adminModal cancel button, scrollPosition:', scrollPosition.current, 'current scrollY:', window.scrollY);
                     setShowAdminModal(false);
                     window.scrollTo(0, scrollPosition.current);
                   }}
@@ -1381,6 +1399,7 @@ function App() {
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
+                console.log('Closing newSectionModal overlay, scrollPosition:', scrollPosition.current, 'current scrollY:', window.scrollY);
                 setShowNewSectionModal(false);
                 window.scrollTo(0, scrollPosition.current);
               }
@@ -1411,6 +1430,7 @@ function App() {
               <div className="flex space-x-2 mt-4">
                 <button
                   onClick={() => {
+                    console.log('Closing newSectionModal add button, scrollPosition:', scrollPosition.current, 'current scrollY:', window.scrollY);
                     handleAddSection();
                     window.scrollTo(0, scrollPosition.current);
                   }}
@@ -1420,6 +1440,7 @@ function App() {
                 </button>
                 <button
                   onClick={() => {
+                    console.log('Closing newSectionModal cancel button, scrollPosition:', scrollPosition.current, 'current scrollY:', window.scrollY);
                     setShowNewSectionModal(false);
                     window.scrollTo(0, scrollPosition.current);
                   }}
@@ -1649,6 +1670,7 @@ function App() {
                                       sectionKey={key}
                                       platformId={platform.id}
                                       onClose={() => {
+                                        console.log('Closing EditForm, scrollPosition:', scrollPosition.current, 'current scrollY:', window.scrollY);
                                         setEditMode(null);
                                         window.scrollTo(0, scrollPosition.current);
                                       }}
@@ -1677,6 +1699,7 @@ function App() {
             className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[9999]"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
+                console.log('Closing previewImage overlay, scrollPosition:', scrollPosition.current, 'current scrollY:', window.scrollY);
                 setPreviewImage(null);
                 window.scrollTo(0, scrollPosition.current);
               }
@@ -1691,6 +1714,7 @@ function App() {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
+                  console.log('Closing previewImage button, scrollPosition:', scrollPosition.current, 'current scrollY:', window.scrollY);
                   setPreviewImage(null);
                   window.scrollTo(0, scrollPosition.current);
                 }}
@@ -1708,6 +1732,7 @@ function App() {
             className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-9999"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
+                console.log('Closing selectedImageInfo overlay, scrollPosition:', scrollPosition.current, 'current scrollY:', window.scrollY);
                 setSelectedImageInfo(null);
                 window.scrollTo(0, scrollPosition.current);
               }
@@ -1719,6 +1744,7 @@ function App() {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
+                  console.log('Closing selectedImageInfo button, scrollPosition:', scrollPosition.current, 'current scrollY:', window.scrollY);
                   setSelectedImageInfo(null);
                   window.scrollTo(0, scrollPosition.current);
                 }}
