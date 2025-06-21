@@ -282,32 +282,39 @@ function App() {
   };
 
   // 初始化图片画廊数据
-  const initializeGalleryData = (platformData) => {
-    const images = {};
-    Object.entries(platformData).forEach(([sectionKey, section]) => {
-      images[sectionKey] = [];
-      Object.entries(section.data).forEach(([platformId, data]) => {
-        Object.entries(data).forEach(([fieldKey, value]) => {
-          if (fieldKey === 'image' && value) {
-            const platform = platforms.find(p => p.id == platformId);
+  // 初始化图片画廊数据
+const initializeGalleryData = (platformData, platformsArray) => {
+  const images = {};
+  Object.entries(platformData).forEach(([sectionKey, section]) => {
+    images[sectionKey] = [];
+    Object.entries(section.data).forEach(([platformId, data]) => {
+      Object.entries(data).forEach(([fieldKey, value]) => {
+        if (fieldKey === 'image' && value) {
+          const numericPlatformId = parseInt(platformId);
+          const platform = platformsArray.find(p => p.id === numericPlatformId);
+          if (platform) {
             images[sectionKey].push({
-              platformId: parseInt(platformId),
-              platformName: platform?.name || 'Unknown',
+              platformId: numericPlatformId,
+              platformName: platform.name,
               url: value,
-              description: `${platform?.name} - ${section.label}`,
+              description: `${platform.name} - ${section.label}`,
               uploadTime: new Date().toISOString().split('T')[0]
             });
           }
-        });
+        }
       });
     });
-    setGalleryImages(images);
-  };
+  });
+  setGalleryImages(images);
+};
 
   // 从平台对比页面同步图片到可视化展示中心
   const syncImageToGallery = (sectionKey, platformId, imageUrl, description) => {
-    const platform = platforms.find(p => p.id === platformId);
-    if (!platform) return;
+  const platform = platforms.find(p => p.id === platformId);
+  if (!platform) {
+    console.warn(`Platform not found for ID: ${platformId}`);
+    return;
+  }
 
     setGalleryImages(prev => {
       const updated = { ...prev };
@@ -433,7 +440,7 @@ function App() {
       setAdvantagePlatforms(formattedAdvantage);
 
       // 初始化图片画廊数据
-      initializeGalleryData(formattedData);
+      initializeGalleryData(formattedData, platformsData || []);
     } catch (error) {
       console.error('加载数据失败:', error);
       showToast('数据加载失败，请检查网络连接');
